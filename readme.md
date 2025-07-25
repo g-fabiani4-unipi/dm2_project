@@ -1,4 +1,4 @@
-# Repository for Data Mining Fundamentals project
+# Repository for Data Mining Advanced Topics and Applications project
 ## Directories
 - `data`: raw data;
 - `src`: the project source code (jupyter notebooks, scripts etc.);
