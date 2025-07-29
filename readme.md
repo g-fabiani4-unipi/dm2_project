@@ -7,12 +7,15 @@
 
 Remember to name all files according to their content or function.
 
+In some cases github may not be able to render some notebooks.
+In this case you can view the notebook online with [nbviewer](https://nbviewer.org/).
+
 ## Installation
 ### Clone this repository
 
 ```
 git clone https://github.com/g-fabiani4-unipi/dm2_project.git
-cd dm1_project
+cd dm2_project
 ```
 
 ### Environment and dependencies
