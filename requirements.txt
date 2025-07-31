@@ -41,6 +41,7 @@ jupyter-server-mathjax==0.2.6
 jupyter-server-terminals==0.5.3
 jupyterlab-pygments==0.3.0
 kiwisolver==1.4.8
+llvmlite==0.44.0
 markupsafe==3.0.2
 matplotlib==3.10.3
 matplotlib-inline==0.1.7
@@ -50,7 +51,8 @@ nbconvert==7.16.6
 nbdime==4.0.2
 nbformat==5.10.4
 nest-asyncio==1.6.0
-numpy==2.3.1
+numba==0.61.2
+numpy==2.2.6
 overrides==7.7.0
 packaging==25.0
 pandas==2.3.1
@@ -66,6 +68,7 @@ ptyprocess==0.7.0
 pure-eval==0.2.3
 pycparser==2.22
 pygments==2.19.2
+pyod==2.0.5
 pyparsing==3.2.3
 python-dateutil==2.9.0.post0
 python-json-logger==3.3.0
@@ -90,6 +93,7 @@ terminado==0.18.1
 threadpoolctl==3.6.0
 tinycss2==1.4.0
 tornado==6.5.1
+tqdm==4.67.1
 traitlets==5.14.3
 types-python-dateutil==2.9.0.20250516
 typing-extensions==4.14.0
