@@ -1,0 +1,6 @@
+Resampling Method,accuracy,precision,recall,f1,average precision
+No strategy,0.92 $\pm$ 0.00,0.47 $\pm$ 0.02,0.31 $\pm$ 0.01,0.37 $\pm$ 0.01,0.29 $\pm$ 0.01
+Random Oversampling,0.87 $\pm$ 0.00,0.32 $\pm$ 0.01,0.52 $\pm$ 0.01,0.39 $\pm$ 0.01,0.24 $\pm$ 0.01
+SMOTE,0.84 $\pm$ 0.00,0.28 $\pm$ 0.00,0.66 $\pm$ 0.01,0.40 $\pm$ 0.01,0.27 $\pm$ 0.01
+Random Undersampling,0.76 $\pm$ 0.00,0.23 $\pm$ 0.00,0.85 $\pm$ 0.01,0.36 $\pm$ 0.00,0.42 $\pm$ 0.01
+Edited NN,0.92 $\pm$ 0.00,0.49 $\pm$ 0.00,0.46 $\pm$ 0.01,0.47 $\pm$ 0.00,0.47 $\pm$ 0.01
