@@ -67,3 +67,10 @@ git checkout branch_name
 git push origin branch_name
 ```
 4. Create a pull request on the github repository
+
+## Large Data Files
+
+The following files are too large for GitHub:
+
+- [RF_rating.pkl (2.3 GB)](https://1drv.ms/u/c/e03777c90ec9d443/EXazl7UfrelAqNyF7QRg3JwB5L-qnZoVRd2zn4rgMJx6Lw?e=am21Le)
+
