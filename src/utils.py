@@ -1,6 +1,7 @@
 from sklearn.metrics import precision_recall_curve, average_precision_score
 from sklearn.utils import _safe_indexing
 from sklearn.utils._response import _get_response_values_binary
+from sklearn.metrics import silhouette_samples, silhouette_score
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -74,3 +75,63 @@ def draw_pr_curve_from_cv_results(cv_results, X, y, name:str=None, color:str=Non
     )
 
     ax.legend(bbox_to_anchor=(1, 1))
+
+
+
+def plot_silhouette(X, cluster_labels, ax=None):
+    """
+    Draw silhouette scores for all clustered samples
+
+    Parameters:
+    -----------
+    X: dataset on which the clustering is made or square distance matrix
+
+    cluster_labels: labels returned by a clustering estimator
+
+    ax: (optional) axes on which to plot
+    """
+
+    if not ax:
+        _, ax = plt.subplots()
+    n_clusters = len(np.unique(cluster_labels))
+    silhouette_avg = silhouette_score(X, cluster_labels)
+    sample_silhouette_values = silhouette_samples(X, cluster_labels)
+
+    # The (n_clusters+1)*10 is for inserting blank space between silhouette
+    # plots of individual clusters, to demarcate them clearly.
+    ax.set_ylim([0, len(X) + (n_clusters + 1) * 10])
+
+    y_lower = 10
+    for i in range(1, n_clusters + 1):
+        # Aggregate the silhouette scores for samples belonging to
+        # cluster i, and sort them
+        ith_cluster_silhouette_values = sample_silhouette_values[cluster_labels == i]
+
+        ith_cluster_silhouette_values.sort()
+
+        size_cluster_i = ith_cluster_silhouette_values.shape[0]
+        y_upper = y_lower + size_cluster_i
+
+        color = f'C{i}'
+        ax.fill_betweenx(
+            np.arange(y_lower, y_upper),
+            0,
+            ith_cluster_silhouette_values,
+            facecolor=color,
+            edgecolor=color,
+            alpha=0.7,
+        )
+
+        # Label the silhouette plots with their cluster numbers at the middle
+        ax.text(-0.05, y_lower + 0.5 * size_cluster_i, str(i))
+
+        # Compute the new y_lower for next plot
+        y_lower = y_upper + 10  # 10 for the 0 samples
+
+    ax.set_xlabel("Silhouette coefficient values")
+    ax.set_ylabel("Cluster label")
+
+    # The vertical line for average silhouette score of all the values
+    ax.axvline(x=silhouette_avg, color="k", linestyle="--")
+
+    ax.set_yticks([])  # Clear the yaxis labels / ticks
