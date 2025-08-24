@@ -1,3 +1,4 @@
 *.ipynb	diff=jupyternotebook
 *.ipynb	merge=jupyternotebook
 results/svm_rating_overfitting_model.pkl filter=lfs diff=lfs merge=lfs -text
+results/rf_regression.pkl filter=lfs diff=lfs merge=lfs -text
