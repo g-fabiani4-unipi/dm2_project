@@ -1,0 +1,3 @@
+Model,mean_squared_error,R2
+KNN,0.64 $\pm$ 0.11,0.20 $\pm$ 0.06
+C22 KNN,0.60 $\pm$ 0.09,0.25 $\pm$ 0.09
