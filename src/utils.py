@@ -4,6 +4,7 @@ from sklearn.utils._response import _get_response_values_binary
 from sklearn.metrics import silhouette_samples, silhouette_score
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 def draw_pr_curve_from_cv_results(cv_results, X, y, name:str=None, color:str=None, ax=None):
     """
@@ -135,3 +136,22 @@ def plot_silhouette(X, cluster_labels, ax=None):
     ax.axvline(x=silhouette_avg, color="k", linestyle="--")
 
     ax.set_yticks([])  # Clear the yaxis labels / ticks
+
+
+def print_cv_results(cv_results, ndigits=2):
+    for key, value in cv_results.items():
+        if key.startswith('test_'):
+            print(f'{key.removeprefix('test_')}: {round(np.mean(value), ndigits)} ({round(np.std(value), ndigits)})')
+
+
+def cv_results_to_long(cv_results):
+    cv_results = pd.DataFrame(cv_results)
+    id_vars = [col for col in cv_results.columns if not col.startswith('split')]
+    value_vars = [col for col in cv_results.columns if col.startswith('split')]
+    long = cv_results.melt(
+        id_vars=id_vars,
+        value_vars=value_vars,
+        var_name='split',
+        value_name='test_score'
+    )
+    return long
