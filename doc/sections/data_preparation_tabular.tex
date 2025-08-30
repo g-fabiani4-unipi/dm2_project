@@ -210,3 +210,25 @@ At this point, we still have missing values for \textit{countryOfOrigin}, \texti
 Since the distribution of \textit{runtimeMinutes} depends on \textit{titleType}, and the same holds true for \textit{writerCredits}, we imputed their missing values using the median value within each respective class.
 
 On the other hand, we chose not to replace missing values for \textit{genres}, \textit{region} or \textit{countryOfOrigin}. They can easily be handled when performing the encoding for our methods without introducing bias, therefore we'd rather preserve the original distributions and correlations.
+
+\subsection{Clustering}
+\begin{figure*}
+    \includegraphics[width=\textwidth]{../results/images//understanding_clustering.png}
+    \caption{Hierarhical clustering results on tabular data by runtime and number of votes.}
+    \label{fig:tabular_clustering}
+\end{figure*}
+
+As part of the data understanding phase, we conducted hierarchical clustering on the dataset, using all numeric attributes.
+
+Since the size of the dataset made it unfeasible to perform hierarchical clustering directly because of the computational cost of computing distances between all records, we firstly reduced our dataset to a more manageable 10,000 records, running k-means clustering with k=10,000.
+
+We then performed hierarhical clustering on the centroids of kmeans clusters, experimenting with different linkage methods and inspecting the resulting dendrograms. We found that using average linkage yielded the most satisfactorily results. We then cut the dendrogram at an appropriate threshold and, after propagating cluster labels back to the entire dataset, analyzed the composition of the clusters.
+
+We found 13 clusters of varying sizes, with the top cluster grouping one fifth of the entire dataset and the top four clusters grouping half of the dataset. Five clusters contained less than 5,000 records each.
+
+For reasons that wil become apparent in \ref{sec:anomaly_detection}, we concentrated our analysis on two smaller clusters: C1 (1,668 records) and C2 (3,923). These clusters belong to the same supercluster, that is merged latest of all with the rest of the dataset.
+
+Both clusters are made up primarily from movies (with some tv series), and according to their distribution w.r.t. \emph{numVotes}, probably contain blockbuster movies and very popular TV series \ref{fig:tabular_clustering}.
+In addition to that, almost 57\% of records from C1 received awards, a proportion that increases to 80\% when considering also nominations.
+C2 records were also well received, with 45\% of them having received or being considered for awards.
+In addition to that, 87\% of records from C1 and 45\% of records from C2 have videos on their IMDB page and almost all records from both C1 and C2 have both reviews from users and from critics.
