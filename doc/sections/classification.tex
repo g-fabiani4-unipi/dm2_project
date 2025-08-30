@@ -40,16 +40,75 @@ The 15 most important features are reported in Fig. \ref{fig:LR_feat_impo_tt.png
     \label{fig:LR_feat_impo_tt.png}
 \end{figure}
 
-\subsection{Linear Support Vector Classifier}
+\subsection{Linear Support Vector Machine}
+For Support Vector Machines (SVMs), we scaled numerical features using RobustScaler. We tested the linear kernel and the Radial Basis Function kernel separately to exploit sklearn's optimized LinearSVC implementation.
+
+\subsubsection{Rating}
+For LinearSVC, we tested the following parameter grid using a 5-fold cross validation:
+
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,
+                   escapeinside={(*@}{@*)}]
+  { 'C': [(*@\textbf{0.001}@*), 0.01, 0.1, 1, 10, 100],
+    'penalty': ['l1', (*@\textbf{'l2'}@*)],
+    'loss': [(*@\textbf{'squared\_hinge'}@*), 'hinge'],
+    'max_iter': [5000],
+    'class_weight': [None, (*@\textbf{'balanced'}@*)]  }
+\end{lstlisting}
+
+It resulted in an average macro F1 of 0.158 for validation and of 0.164 on the training set.
+
+On the test set, w.r.t. Logistic Regression, the model achieved a higher \textbf{macro F1} (\textbf{0.158}), but a lower \textbf{accuracy} (\textbf{0.270}).
+Indeed, the F1 for the best performing classes has decreased ((7,8]: 0.496 vs 0.544; (6,7]: 0.215 vs 0.356, (5,6]: 0.259 vs 0.283), in favor of slightly better performances for classes with lower support: the decrease in accuracy is linked to the fact that the model tries to predict these lower support classes more often, rather than focusing merely on the central classes. This led to a notable increase in F1 for (3,4] (0.113 vs 0.04) and (9,10] (0.145 vs 0.046), but it is clear that the model still struggles. The \textbf{PR AUC} is also slightly worse, \textbf{0.175}.
+
+The confusion matrix confirms this tendency: if for Logistic Regression predictions were concentrated on the best performing classes, with many zeros populating the lowest classes, now confusion is spread throughout. 
+
+The most important feature is \textit{tvEpisode} (mean absolute value: 0.175): it is at number one, with negative values, for classes from (2,3] to (5,6] — this would suggest that serialized content is less likely to have bad rating. Classes (7,8] and (8,9] both have \textit{movie} as most important feature, with negative contributions (-0.207 and -190, respectively). This might explain why the latter is mostly classified as the former, which is the class with the highest support.
+
+\subsubsection{Title Type}
+The model returned by the grid search yielded an average validation macro F1 of 0.646 (vs 0.654 on the training set); the parameters were \texttt{'C': 0.1, 'class\_weight': 'balanced', 'loss': 'squared\_hinge', 'max\_iter': 5000, 'penalty': 'l1'}.
+
+On the test set, the results were slightly lower than Logistic Regression: \textbf{0.640 macro F1}, \textbf{0.889 accuracy}, \textbf{0.674 PR AUC}. Indeed, performances for almost all classes have decreased to some degree, with a remarkable dip in precision for \textit{videogame} (0.486 vs 0.799).
+
+The overall most important features are the same (\textit{canHaveEpisodes} and genre \textit{Short}), but now only the first stands out (mean absolute value close to 2.5), while \textit{Short} has a similar value to the rest of the top features, < 1.
+
+Unexpectedly, the most important feature for the \textit{titleType} \textit{short} is now \textit{canHaveEpisodes}, with quite an 'advantage' (coef: -2.18, vs genre \textit{Short} 1.43).
+
+\subsection{Support Vector Machine with Radial Basis Function (RBF)}
+The power of SVMs comes at a high computational cost, which is why we only tested one kernel function (RBF) and why we opted for an 80/20 holdout, instead of a k-fold cross-validation, to carry out hyperparameter tuning. We also chose a small parameter grid to test out: 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,
+                   escapeinside={(*@}{@*)}]
+  { 'C': [0.1, 1, 10],
+    'gamma': ['scale', 0.01, 0.1],
+    'class_weight': [None, 'balanced']  }
+\end{lstlisting}
+
+\subsubsection{Rating}
+The best model returned by the grid search had the following hyperparameters: \texttt{{'C': 10, 'gamma': 0.1, 'class\_weight': None}}. It achieved a macro F1 of 0.265 on the validation set and of 0.698 on the training set, suggesting overfitting.
+We therefore reran the grid search, excluding the highest values for C and gamma in order to increase regularization. The best performing model was less overfitted, but also achieved lower results (macro F1 0.206 for validation and 0.316 for training). Its parameters are \texttt{'C': 1, 'class\_weight': 'balanced', 'gamma': 'scale'}.
+
+On the test set, the overfitted model proved to be the best one, achieving a \textbf{macro F1} of \textbf{0.257} (vs 0.219) and an \textbf{accuracy} of \textbf{0.431} (vs 0.314). The resulting \textbf{PR AUC }is \textbf{0.231}. This model is also the best performing one thus far, with improvements observed across almost all classes.
+
+Looking at the confusion matrix, we can see that the model doesn't completely snub lower support classes, like Logistic Regression did, but is more accurate than LinearSVC. Especially for the more popular (and better performing) classes, confusion is mostly among neighboring classes.
+
+\subsubsection{Title Type}
+Similarly to what had happened with \textit{rating}, the first grid search returned an overfitted model (macro F1 for validation: 0.746, vs for training: 0.905). Forcing regularization resulted in less overfitting, but much poorer performances (validation macro F1: 0.206, train macro F1: 0.316); for this reason, we chose the first classifier. Its parameters are: \texttt{'C': 10, 'class\_weight': None, 'gamma': 'scale'}.
+
+On the test set, this model clears all previous attempts, with a \textbf{macro F1} of \textbf{0.746} and an \textbf{accuracy} of \textbf{0.938}.
+
+The performances for all classes increased. \textbf{tvEpisode} now achieves an F1 of 0.99; \textbf{videogame} improved greatly, reaching 0.884 F1. Nevertheless, we only get a \textbf{PR AUC} of \textbf{0.689}; indeed, the curves in Fig. \ref{fig:pr_svm_rbf_tt.png} show how the precision for half of the classes sinks at around 60\% recall. This means that while the model shows excellent performance metrics on a per-class basis, it has difficulty maintaining a reliable performance when attempting to comprehensively identify instances of minority classes.
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/pr_svm_rbf_tt.png}
+    \caption{PR curves for \textit{titleType} (SVM with RBF).}
+    \label{fig:pr_svm_rbf_tt.png}
+\end{figure}
+
+\subsection{Random Forest}
+
+\subsection{LightGBM}
 
 
-\subsection{Support Vector Classifier with Radial Basis Function}
-
-
-\subsection{LightGBM Classifier}
-
-
-\subsection{Multilayer Perceptron Classifier}
+\subsection{Multilayer Perceptron}
 
 
 \subsection{Conclusions}
