@@ -1,0 +1,14 @@
+In this section, we  will examine the performance of various advanced classification methods w.r.t two multiclass classification tasks, aiming to predict the \textit{rating} class and the \textit{titleType} of our records.
+
+Since no features showed high correlation with \textit{averageRating}, while some did exhibit different distribution tendencies w.r.t. \textit{titleType}, we anticipated that the second classification task would yield better results.
+
+In evaluating and comparing our classification models, we selected macro F1 as the main performance metric, given that the different target classes have variable support. For each model, we additionally plotted the Precision-Recall (PR) curves for each class using the one-vs-rest strategy and reported its PR AUC. We favored PR curves instead of ROC curves because they are more informative in multiclass and imbalanced settings.
+
+\subsection{Pre-processing}
+\label{classification_preprocessing}
+For each model, we built a pipeline which proceeded to first preprocess the data (we used the training and test set, cleaned and prepared as detailed in Sec. \ref{data_understanding}) and then pass it to the model, in order for it to be fitted on the training set or applied on the test set.
+
+The preprocessing step included scaling the numerical features, if required by the method, and one-hot encoding the categorical variables. For both tasks, we of course dropped the target variable, including \textit{averageRating} for the rating task.
+
+For \textit{countryOfOrigin} and \textit{region}, we only kept the 25 most frequent countries, aggregating the rest into an \textit{Other} category, to reduce dimensionality. For the MultiLayerPerceptron Classifier (and, later, for the regression task), we further reduced dimensionality, keeping only the top nine countries for both features and dropping \textit{hasAwards} on the account of its positive correlation to \textit{hasAwardsOrNominations}, in order to further reduce computational costs and training time during hyperparameter tuning. 
+
