@@ -86,7 +86,7 @@ Before analyzing numeric variables, we added the same features we had added to t
 
 A pairplot of all numeric variables, with KDE graphs on the diagonal, allowed us to gain a global view of both the features' univariate distribution and their pairwise correlations. Given the size of the dataset, we resorted to using a random sample of 20,000 records.
 The great majority of the variables has a right-skewed distribution (\textit{writerCredits, numRegions, awardWins, totalImages, criticReviewsTotal, runtimeMinutes, userReviewsTotal, totalCredits, totalVideos, castNumber, numVotes, quotesTotal, awardNominationsExcludeWins, companiesNumber, externalLinks, awardsAndNominations, numCountriesOfOrigin, reviewsTotal}).
-\textit{averageRating}, of course, follows the same left-skewed distribution of its discretized version, \textit{rating}.
+\textit{averageRating}, of course, follows the same left-skewed distribution observed for its discretized version, \textit{rating} (cf. Fig. \ref{fig:rating_histogram.png}).
 
 We observed that some records have an implausibly long runtime, probably due to the inconsistent strategy adopted for the computation of the runtime for serialized content, for which sometimes the total runtime of a series is registered, rather than the average episode runtime.
 In order to avoid this problem, we removed the runtime of all \textit{tvSeries}, \textit{tvMiniSeries}, and \textit{tvEpisodes} for which the value exceeded the 3rd quartile + 1.5 interquartile range for its specific category (105, 382.5 and 84 minutes, respectively); a total of 1560 records in the training set were affected.
@@ -214,7 +214,7 @@ On the other hand, we chose not to replace missing values for \textit{genres}, \
 \subsection{Clustering}
 \begin{figure*}
     \includegraphics[width=\textwidth]{../results/images//understanding_clustering.png}
-    \caption{Hierarhical clustering results on tabular data by runtime and number of votes.}
+    \caption{Hierarchical clustering results on tabular data by runtime and number of votes.}
     \label{fig:tabular_clustering}
 \end{figure*}
 
@@ -222,7 +222,7 @@ As part of the data understanding phase, we conducted hierarchical clustering on
 
 Since the size of the dataset made it unfeasible to perform hierarchical clustering directly because of the computational cost of computing distances between all records, we firstly reduced our dataset to a more manageable 10,000 records, running k-means clustering with k=10,000.
 
-We then performed hierarhical clustering on the centroids of kmeans clusters, experimenting with different linkage methods and inspecting the resulting dendrograms. We found that using average linkage yielded the most satisfactorily results. We then cut the dendrogram at an appropriate threshold and, after propagating cluster labels back to the entire dataset, analyzed the composition of the clusters.
+We then performed hierarchical clustering on the centroids of K-Means clusters, experimenting with different linkage methods and inspecting the resulting dendrograms. We found that using average linkage yielded the most satisfactorily results. We then cut the dendrogram at an appropriate threshold and, after propagating cluster labels back to the entire dataset, analyzed the composition of the clusters.
 
 We found 13 clusters of varying sizes, with the top cluster grouping one fifth of the entire dataset and the top four clusters grouping half of the dataset. Five clusters contained less than 5,000 records each.
 
