@@ -1,13 +1,13 @@
 The goal of this project is to analyze two datasets providing different kinds of information about movies, TV shows, and other forms of visual entertainment.
 
-The tabular dataset is an extension of the one proposed in DM1: the records include key information about titles, insights into critical aspects such as awards and reviews, as well as ratings and further data about the title's production. 
+The tabular dataset is an extension of the one proposed in DM1: the records include key information about titles, insights into critical aspects such as awards and reviews, as well as ratings and further data about the title's production.
 The time series dataset, on the other hand, represents the domestic daily gross income of movies at the box office, measured from their release, complemented with information about the film's average rating and genre.
 
 In the following section, we'll focus on the tabular dataset, while the overview about the time series dataset composition and preparation can be found in Section \ref{time_series_analysis}.
 
 \subsection{Data Semantics, Duplicates and Train/Test Split}
 
-The tabular dataset contains 149531 records and 32 attributes; the nine attributes that were added to the original set from the DM1 dataset are reported in Tab. {\ref{tab:original_feats}}. This makes a total of nine categorical attributes, three binary attributes and 20 numerical attributes. Among the latter, only \textit{runtimeMinutes} and \textit{averageRating} can be classified as continuous, as the others mostly represent counts. 
+The tabular dataset contains 149,531 records and 32 attributes; the nine attributes that were added to the original set from the DM1 dataset are reported in Tab. {\ref{tab:original_feats}}. This makes a total of nine categorical attributes, three binary attributes and 20 numerical attributes. Among the latter, only \textit{runtimeMinutes} and \textit{averageRating} can be classified as continuous, as the others mostly represent counts.
 
 A first data quality check revealed only ten genuine duplicates, i.e. records sharing all feature values, which we dropped.
 
@@ -37,7 +37,9 @@ We then split the dataset, reserving 70\% for training, and the remaining 30\% f
 \end{table*}
 
 \subsection{First Global Exploration of the Training Set}
-A first global analysis of the dataframe's summary and descriptive statistics revealed missing values for \textit{endYear} (100729), \textit{runtimeMinutes} (28185), \textit{countryOfOrigin} (27961) and \textit{genres} (1887). Since most records are missing an \textit{endYear}, and the feature is strongly correlated to \textit{startYear}, we dropped it.
+A first global analysis of the dataframe's summary and descriptive statistics revealed missing values for \textit{endYear} (100,729), \textit{runtimeMinutes} (28,185), \textit{countryOfOrigin} (27,961) and \textit{genres} (1,887). Since most records are missing an \textit{endYear}, and the feature is strongly correlated to \textit{startYear}, we dropped it.
+
+Since a great majority of records had no information about sound mixes, we decided to drop this feature as well.
 
 \textit{bestRating}, \textit{worstRating}, and \textit{isRatable} were once again confirmed to be uninformative, as they only take one value for all records (10, 1, and 1, respectively), and were therefore dropped. We also dropped \textit{ratingCount}, as it was strongly correlated to \textit{numVotes}, and \textit{isAdult}, because it's redundant w.r.t. the \textit{adult} category in \textit{genres}.
 
@@ -47,19 +49,12 @@ Lastly, we removed the string \texttt{'\textbackslash \textbackslash N'}, which 
 
 
 \subsection{Distribution of Categorical Variables and Statistics}
-In this subsection, we studied the univariate and bivariate distribution of categorical variables, which all turned out to be unbalanced.
-
-Differently from the DM1 dataset, the most popular \textit{\textbf{titleType}} is \textit{tvEpisode} (47\% of the records), followed by \textit{movie} (25\%) and \textit{short} (11\%); \textit{tvSpecial} (0.79\%) and \textit{tvShort} (0.17\%) are the classes with the lowest support. With regard to \textit{\textbf{genres}}, the two most popular classes are by far \textit{Drama} and \textit{Comedy}, although it depends on \textit{titleType} (cf. Fig. \ref{fig:genre_by_titleType.png}).
-Binned \textit{\textbf{rating}} follows a left-skewed distribution, with the mode being the [7,8) class (Fig. \ref{fig:rating_histogram.png}).
-The most popular \textit{\textbf{countryOfOrigin}} and \textit{\textbf{region}} is the US, but both features have a substantial amount of missing values: \textit{nan} is the second most popular value for both.
-
-We dropped \textit{soundMixes}: not only are most of its 59 unique values very rare, it has too many missing values to provide useful information.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\columnwidth]{../results/images/genre_by_titleType.png}
-    \caption{Distribution of \textit{genres} across \textit{titleTypes}.}
-    \label{fig:genre_by_titleType.png}
+    \includegraphics[width=\columnwidth]{../results/images/titleType_distribution.png}
+    \caption{Distribution of \textit{titleTypes}.}
+    \label{fig:titleType_distribution}
 \end{figure}
 
 \begin{figure}
@@ -68,6 +63,14 @@ We dropped \textit{soundMixes}: not only are most of its 59 unique values very r
     \caption{Barplot for \textit{rating}.}
     \label{fig:rating_histogram.png}
 \end{figure}
+
+In this subsection, we studied the univariate and bivariate distribution of categorical variables, which all turned out to be unbalanced.
+
+Differently from the DM1 dataset, the most popular \textit{\textbf{titleType}} is \textit{tvEpisode} (47\% of the records), followed by \textit{movie} (25\%) and \textit{short} (11\%); \textit{tvSpecial} (0.79\%) and \textit{tvShort} (0.17\%) are the classes with the lowest support (cf Fig \ref{fig:titleType_distribution}). With regard to \textit{\textbf{genres}}, the two most popular classes are by far \textit{Drama} and \textit{Comedy}, although it depends on \textit{titleType}.
+Binned \textit{\textbf{rating}} follows a left-skewed distribution, with the mode being the [7,8) class (Fig. \ref{fig:rating_histogram.png}).
+The most popular \textit{\textbf{countryOfOrigin}} and \textit{\textbf{region}} is the US, but both features have a substantial amount of missing values: \textit{nan} is the second most popular value for both.
+
+We dropped \textit{soundMixes}: not only are most of its 59 unique values very rare, it has too many missing values to provide useful information.
 
 
 \subsection{Distribution of Numeric Variables and Statistics}
@@ -81,12 +84,14 @@ Before analyzing numeric variables, we added the same features we had added to t
     \item \textit{awardsAndNominations}: the sum of \textit{awardWins} and \textit{awardNominationsExcludeWins}.
 \end{itemize}
 
-A pairplot of all numeric variables, with KDE graphs on the diagonal, allowed us to gain a global view of both the features' univariate distribution and their pairwise correlations. Given the size of the dataset, we resorted to using a random sample of 20000 records. The great majority of the variables has a right-skewed distribution (\textit{writerCredits, numRegions, awardWins, totalImages, criticReviewsTotal, runtimeMinutes, userReviewsTotal, totalCredits, totalVideos, castNumber, numVotes, quotesTotal, awardNominationsExcludeWins, companiesNumber, externalLinks, awardsAndNominations, numCountriesOfOrigin, reviewsTotal}). \textit{averageRating}, of course, follows the same left-skewed distribution of its discretized version, \textit{rating}.
+A pairplot of all numeric variables, with KDE graphs on the diagonal, allowed us to gain a global view of both the features' univariate distribution and their pairwise correlations. Given the size of the dataset, we resorted to using a random sample of 20,000 records.
+The great majority of the variables has a right-skewed distribution (\textit{writerCredits, numRegions, awardWins, totalImages, criticReviewsTotal, runtimeMinutes, userReviewsTotal, totalCredits, totalVideos, castNumber, numVotes, quotesTotal, awardNominationsExcludeWins, companiesNumber, externalLinks, awardsAndNominations, numCountriesOfOrigin, reviewsTotal}).
+\textit{averageRating}, of course, follows the same left-skewed distribution of its discretized version, \textit{rating}.
 
 We observed that some records have an implausibly long runtime, probably due to the inconsistent strategy adopted for the computation of the runtime for serialized content, for which sometimes the total runtime of a series is registered, rather than the average episode runtime.
 In order to avoid this problem, we removed the runtime of all \textit{tvSeries}, \textit{tvMiniSeries}, and \textit{tvEpisodes} for which the value exceeded the 3rd quartile + 1.5 interquartile range for its specific category (105, 382.5 and 84 minutes, respectively); a total of 1560 records in the training set were affected.
 
-A similar problem was found for \textit{writerCredits}: records with suspiciously high values are likely TV episodes for which all writers of the entire TV series were erroneously credited. 
+A similar problem was found for \textit{writerCredits}: records with suspiciously high values are likely TV episodes for which all writers of the entire TV series were erroneously credited.
 Therefore, we decided to remove the values for \textit{writerCredits} from 2100 \textit{tvEpisodes}, as they exceeded the 3rd quartile + 1.5 interquartile range (8.5 credits).
 
 \subsection{Variable Transformation, Pairwise Correlations and Elimination of Variables}
@@ -99,11 +104,12 @@ We log-transformed all right-skewed variables, and used the Shapiro-Wilk test to
     \label{fig:corr_heatmap_before.png}
 \end{figure}
 
-We removed the following features because they were highly correlated to another feature: \textit{awardNominationsExcludeWins} (0.86, correlated with \textit{awardsAndNominations}), \textit{castNumber} (0.74, with \textit{totalCredits}), and \textit{reviewsTotal} (0.91, with \textit{userReviewsTotal}).
+We removed the following features because they were highly correlated to another feature: \textit{awardNominationsExcludeWins} (0.86, correlated with \textit{awardsAndNominations}), \textit{castNumber} (0.74, with \textit{totalCredits}).
+Since all features regarding reviews and \textit{numVotes} were highly correlated with each other, we dropped them all with the exception of \textit{numVotes}, which has the least skewed distribution, and \textit{criticReviewsRatio}, which offer insights of a different nature. We however decided to conserve information about the presence/absence of reviews by users and critics with the creation of two new boolean features: \textit{hasUserReviews} and textit{hasCriticsReviews}.
 
 Moreover, we binarized features which overwhelmingly took on the value 0 (or 1, in the case of \textit{numCountriesOfOrigin} and \textit{directorsCredits}). The results of these transformations are reported in Table \ref{tab:binarized_features}.
 
-\begin{table}[h]
+\begin{table}
     \centering
     \small
     \setlength{\tabcolsep}{6pt}
@@ -113,17 +119,17 @@ Moreover, we binarized features which overwhelmingly took on the value 0 (or 1, 
     \toprule
     \textbf{Original feature} & \textbf{Boolean version} & \textbf{\% True} \\
     \midrule
-    awardWins            & hasAwards                       & 8,16  \\
-    \makecell[l]{awardsAnd \\ Nominations} 
-                         & \makecell[l]{hasAwardsOr \\ Nominations} & 12,25 \\
-    totalVideos          & hasVideos                       & 7,93  \\
-    criticReviewsTotal   & hasCriticsReviews               & 24,88 \\
-    userReviewsTotal     & hasUserReviews                  & 36,98 \\
-    \makecell[l]{directors \\ Credits} 
-                         & \makecell[l]{moreDirectors \\ Credits} & 9,89  \\
-    quotesTotal          & hasQuotes                       & 13,86 \\
-    \makecell[l]{numCountries \\ OfOrigin} 
-                         & \makecell[l]{moreCountries \\ OfOrigin} & 5,05  \\
+    awardWins            & hasAwards                       & 8.16  \\
+    \makecell[l]{awardsAnd \\ Nominations}
+                         & \makecell[l]{hasAwardsOr \\ Nominations} & 12.25 \\
+    totalVideos          & hasVideos                       & 7.93  \\
+    criticReviewsTotal   & hasCriticsReviews               & 24.88 \\
+    userReviewsTotal     & hasUserReviews                  & 36.98 \\
+    \makecell[l]{directors \\ Credits}
+                         & \makecell[l]{moreDirectors \\ Credits} & 9.89  \\
+    quotesTotal          & hasQuotes                       & 13.86 \\
+    \makecell[l]{numCountries \\ OfOrigin}
+                         & \makecell[l]{moreCountries \\ OfOrigin} & 5.05  \\
     \bottomrule
     \end{tabular}
     \caption{Binarization of numeric features.}
@@ -201,13 +207,28 @@ The total number of final features is 27; they are listed in Tables \ref{tab:dat
 
 \subsection{Handling Missing Values}
 At this point, we still have missing values for \textit{countryOfOrigin}, \textit{region}, \textit{genres}, \textit{runtimeMinutes} and \textit{writerCredits}; some were preexisting, others were removed as detailed Subsec. \ref{numeric_vars_analysis}.
-Since the distribution of \textit{runtimeMinutes} depends on \textit{titleType} (cf. Fig. \ref{fig:boxplot_runtime_by_titleType.png}), and the same holds true for \textit{writerCredits}, we imputed their missing values using the median value within each respective class. 
+Since the distribution of \textit{runtimeMinutes} depends on \textit{titleType}, and the same holds true for \textit{writerCredits}, we imputed their missing values using the median value within each respective class.
 
 On the other hand, we chose not to replace missing values for \textit{genres}, \textit{region} or \textit{countryOfOrigin}. They can easily be handled when performing the encoding for our methods without introducing bias, therefore we'd rather preserve the original distributions and correlations.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=\columnwidth]{../results/images/boxplot_runtime_by_titleType.png}
-    \caption{Runtime distribution across title types.}
-    \label{fig:boxplot_runtime_by_titleType.png}
-\end{figure}
+\subsection{Clustering}
+\begin{figure*}
+    \includegraphics[width=\textwidth]{../results/images//understanding_clustering.png}
+    \caption{Hierarhical clustering results on tabular data by runtime and number of votes.}
+    \label{fig:tabular_clustering}
+\end{figure*}
+
+As part of the data understanding phase, we conducted hierarchical clustering on the dataset, using all numeric attributes.
+
+Since the size of the dataset made it unfeasible to perform hierarchical clustering directly because of the computational cost of computing distances between all records, we firstly reduced our dataset to a more manageable 10,000 records, running k-means clustering with k=10,000.
+
+We then performed hierarhical clustering on the centroids of kmeans clusters, experimenting with different linkage methods and inspecting the resulting dendrograms. We found that using average linkage yielded the most satisfactorily results. We then cut the dendrogram at an appropriate threshold and, after propagating cluster labels back to the entire dataset, analyzed the composition of the clusters.
+
+We found 13 clusters of varying sizes, with the top cluster grouping one fifth of the entire dataset and the top four clusters grouping half of the dataset. Five clusters contained less than 5,000 records each.
+
+For reasons that wil become apparent in \ref{sec:anomaly_detection}, we concentrated our analysis on two smaller clusters: C1 (1,668 records) and C2 (3,923). These clusters belong to the same supercluster, that is merged latest of all with the rest of the dataset.
+
+Both clusters are made up primarily from movies (with some tv series), and according to their distribution w.r.t. \emph{numVotes}, probably contain blockbuster movies and very popular TV series \ref{fig:tabular_clustering}.
+In addition to that, almost 57\% of records from C1 received awards, a proportion that increases to 80\% when considering also nominations.
+C2 records were also well received, with 45\% of them having received or being considered for awards.
+In addition to that, 87\% of records from C1 and 45\% of records from C2 have videos on their IMDB page and almost all records from both C1 and C2 have both reviews from users and from critics.
