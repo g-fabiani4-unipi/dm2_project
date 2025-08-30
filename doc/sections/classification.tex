@@ -1,5 +1,44 @@
 \subsection{Logistic Regression}
+As a baseline, we first tried a Logistic Regression model. As the algorithm assumes that the features follow a Gaussian distribution, we scaled numerical features using PowerTransformer, which reduces skewness and stabilizes variance.
 
+\subsubsection{Rating}
+Using the default parameters yielded a macro F1 of 0.144 and an accuracy of 0.388. We performed a grid search using 5-fold cross validation, which resulted in a very small increase, with a 0.146 average macro F1 on the validation sets and 0.152 on the training set, which at least proves no overfitting.
+We tested the following hyperparameters (the values for the final model are in bold):
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,
+                   escapeinside={(*@}{@*)}]
+  { 'penalty': [(*@\textbf{'l2'}@*), 'l1', 'elasticnet'],
+    'C': [0.001, 0.01, 0.1, 1, (*@\textbf{10}@*), 100],
+    'l1_ratio': [0.1, 0.3, 0.5, 0.7, 0.9],
+    'solver': ['lbfgs', 'sag', 'saga', 'newton-cg',
+        (*@\textbf{'newton-cholesky'}@*), 'liblinear']  }
+\end{lstlisting}
+
+On the test set, the final model achieved a \textbf{macro F1} of\textbf{ 0.145} and an \textbf{accuracy} of \textbf{0.388}, comparable to the default model. The poor performances across decision thresholds are confirmed by the \textbf{PR AUC} of only \textbf{0.193}.
+
+The model has managed to generalize some information only for the classes with the highest support: the performances peak for the mode, (7,8] (F1: 0.544), its neighboring classes are confused for it most of the time, and as we move to the tail of the bell distribution, it achieves consistently poor results (F1 < 0.05).
+
+Looking at the model's coefficients, the overall most important feature is \textit{hasCriticReviews} (mean absolute value > 1.2, while for the other coefficients in the top 15 is in the interval [0.6, 0.7]): it is the first or second-biggest coefficient for the best performing classes (i.e. for the interval (5,8]), and for all of them it takes on a negative value, i.e. having critical reviews lowers the probability of a record of having an 'average' rating.
+
+\subsubsection{Title Type}
+For this task, the final model resulting from the grid search achieved an average validation macro F1 of 0.653 (on the training set: 0.664). The final parameters chosen were: \texttt{{'C': 100, 'penalty': 'l2', 'solver': 'newton-cg'}}.
+
+On the test set, the model achieved a \textbf{macro F1} of \textbf{0.649} and an accuracy of \textbf{0.908}; the improvement w.r.t. the default parameters (0.647 and 0.908) is, again, quite small. The \textbf{PR AUC} is \textbf{0.704}; the curve for each class reflects its performance.
+
+Given that both tasks have 10 target classes, our intuition about \textit{titleType} yielding better results is confirmed.
+
+The four most popular classes (\textit{tvEpisode}, \textit{short}, \textit{movie}, \textit{tvSeries}) achieve great results, with F1 > 0.9. The best performing and most popular class, \textit{tvEpisode}, peaks with 0.978. All other classes (except \textit{tvShort}) achieve a F1 score > 0.4, which is still significantly more than random chance. \textit{Videogame}, in spite of its low support, manages to achieve very good results (F1 0.76).
+
+The 15 most important features are reported in Fig. \ref{fig:LR_feat_impo_tt.png}. Overall, the two most informative features are:
+\begin{itemize}
+    \item \textit{canHaveEpisodes}: it has very high positive values for \textit{tvSeries} (+13.15) and \textit{tvMiniSeries} (+12.18) and negative for all other classes; it's also the most important feature for \textit{movie} (-4.75). 
+    \item genre \textit{Short}: of course, it's the most important feature for \textit{short} and \textit{tvShort}, and it's the second most important for \textit{video} with positive values; it's high up in the ranking with a negative value for \textit{movie}, \textit{tvEpisode}, \textit{tvMovie}.
+\end{itemize}
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/LR_feat_impo_tt.png}
+    \caption{Top 15 most important features for \textit{titleType}}
+    \label{fig:LR_feat_impo_tt.png}
+\end{figure}
 
 \subsection{Linear Support Vector Classifier}
 

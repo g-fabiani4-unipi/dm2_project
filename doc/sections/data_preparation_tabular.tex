@@ -211,12 +211,19 @@ Since the distribution of \textit{runtimeMinutes} depends on \textit{titleType},
 
 On the other hand, we chose not to replace missing values for \textit{genres}, \textit{region} or \textit{countryOfOrigin}. They can easily be handled when performing the encoding for our methods without introducing bias, therefore we'd rather preserve the original distributions and correlations.
 
+%\subsection{Clustering}
+%\begin{figure*}
+%    \includegraphics[width=\textwidth]{../results/images//understanding_clustering.png}
+%    \caption{Hierarchical clustering results on tabular data by runtime and number of votes.}
+%    \label{fig:tabular_clustering}
+%\end{figure*}
+
 \subsection{Clustering}
-\begin{figure*}
-    \includegraphics[width=\textwidth]{../results/images//understanding_clustering.png}
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images//understanding_clustering.png}
     \caption{Hierarchical clustering results on tabular data by runtime and number of votes.}
     \label{fig:tabular_clustering}
-\end{figure*}
+\end{figure}
 
 As part of the data understanding phase, we conducted hierarchical clustering on the dataset, using all numeric attributes.
 
