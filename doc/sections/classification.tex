@@ -41,7 +41,7 @@ The 15 most important features are reported in Fig. \ref{fig:LR_feat_impo_tt.png
 \end{figure}
 
 \subsection{Linear Support Vector Machine}
-For Support Vector Machines (SVMs), we scaled numerical features using RobustScaler. We tested the linear kernel and the Radial Basis Function kernel separately to exploit sklearn's optimized LinearSVC implementation.
+For Support Vector Machines (SVMs), we scaled numerical features using RobustScaler, as our data contains outliers. We deemed it  We tested the linear kernel and the Radial Basis Function kernel separately to exploit sklearn's optimized LinearSVC implementation.
 
 \subsubsection{Rating}
 For LinearSVC, we tested the following parameter grid using a grid search with 5-fold cross validation:
@@ -134,7 +134,7 @@ The model's performance on the test set increases, making it the best model thus
 
 It achieves the most balanced performance, with six classes out of ten scoring an F1 >= 0.3. Confusion remains spread out for the minority classes (from 0 to 4), whereas for the others it remains concentrated amongst neighboring classes.
 
-The Mean Decrease in Impurity (MDI) returned as the most important features \textit{numVotes} and startYear (almost 0.10), followed by \textit{totalCredits} (around 0.9).
+The Mean Decrease in Impurity (MDI) returned as the most important features \textit{numVotes} and \textit{startYear} (almost 0.10), followed by \textit{totalCredits} (around 0.9).
 
 \subsubsection{Title Type}
 The default model achieved an average macro F1 of 0.707 on validation and a score of 0.728 on the test set.
@@ -170,7 +170,73 @@ Checking the 15 most important features (Fig \ref{fig:rf_feat_impo_tt.png}), we 
 Finally, it's worth pointing out that prior experimentation keeping the default hyperparameter \texttt{'class\_weight': None} instead of \texttt{'balanced'} lead to a best model scoring a significantly lower macro F1 score of 0.728. This is indicative of the importance of this hyperparameter for this unbalanced task.
 
 \subsection{LightGBM}
+Within the Gradient Boosting family of algorithms, we selected LightGBM for its efficiency. Since it exploits Decision Trees as base classifiers, numerical features don't require scaling.
 
+Similarly to what we did for Random Forests, we performed hyperparameter using a Randomized Search with 100 iterations and a 3-fold cross-validation to test the same random combinations with 100 and 300 estimators (we excluded 500 estimators because it resulted too computationally expensive). The hyperparameter configurations were sampled from the following grid: 
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
+  { 'boosting_type': ['gbdt', 'goss', 'dart'],
+    'num_leaves': np.arange(20, 100, 10),
+    'max_depth': [-1] + list(np.arange(3, 13)),
+    'learning_rate': [0.01, 0.03, 0.05, 0.1],
+    'reg_alpha': [0, 0.01, 0.1, 1],
+    'reg_lambda': [0, 0.01, 0.1, 1] }
+\end{lstlisting}
+
+\subsubsection{Rating}
+The best resulting model has the following hyperparameters: \texttt{'n\_estimators': 300, 'reg\_lambda': 0.1, 'reg\_alpha': 0.01, 'num\_leaves': 50, 'max\_depth': 10, 'learning\_rate': 0.1, 'boosting\_type': 'gbdt'}. It yielded an average cross-validation macro F1 of 0.285 and of 0.819 on the training set, showing signs of overfitting.
+
+Given the same hyperparameter configuration, increasing the number of estimators leads to a better performance (Fig. \ref{fig:lightgbm_estimators.png}), but also to a larger overfitting gap (i.e. the difference between training and validation macro F1) (Fig. \ref{fig:lightgbm_overfitting.png}).
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/lightgbm_estimators.png}
+    \caption{Avg. cross-validation macro F1 for different parameter configurations for 100 and 300 DTs for \textit{rating} (LightGBM).}
+    \label{fig:lightgbm_estimators.png}
+\end{figure}
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/lightgbm_overfitting.png}
+    \caption{Overfitting gap for different parameter configurations for 100 and 300 DTs for \textit{rating} (LightGBM).}
+    \label{fig:lightgbm_overfitting.png}
+\end{figure}
+
+Fig. \ref{fig:lightgbm_overfitting_vs_performance_rating.png} shows how the overfitting gap grows exponentially as performances increase, suggesting that the data is hard to model.
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/lightgbm_overfitting_vs_performance_rating.png}
+    \caption{Trade-off between avg validation macro F1 and overfitting gap for \textit{rating} (LightGBM).}
+    \label{fig:lightgbm_overfitting_vs_performance_rating.png}
+\end{figure}
+
+On the test set, the model achieved \textbf{0.289 macro F1}, \textbf{0.440 accuracy}, and \textbf{0.299 PR AUC}, positioning itself at second place, under Random Forest.
+
+Consistently with Random Forest, \textit{startYear} and \textit{numVotes} emerged as the most important features, with comparable gain values.
+
+\subsubsection{Title Type}
+Analyzing the results of the Random Searches leads to the same discovery we had for \textit{rating}: given a certain hyperparameter configuration, the average cross-validation macro F1 grows for 300 estimators w.r.t. 100, but so does the overfitting gap. Nevertheless, Fig. \ref{fig:lightgbm_overfitting_vs_performance_tt.png} shows how the relationship between the overfitting gap and the validation macro F1 grows more slowly. Moreover, the best performing models are only moderately overfitted (gap of around 0.2 vs 0.6 for \textit{rating}.)
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/lightgbm_overfitting_vs_performance_tt.png}
+    \caption{Trade-off between avg validation macro F1 and overfitting gap for \textit{titleType} (LightGBM).}
+    \label{fig:lightgbm_overfitting_vs_performance_tt.png}
+\end{figure}
+
+The best model yields a cross-validation macro F1 of 0.791 against a training macro F1 of 0.982. Its parameters are: \texttt{'n\_estimators': 300, 'reg\_lambda': 1, 'reg\_alpha': 0, 'num\_leaves': 20, 'max\_depth': 10, 'learning\_rate': 0.1, 'boosting\_type': 'gbdt'}.
+
+On the test set, it reached \textbf{0.795 macro F1}, \textbf{0.949 accuracy}, and \textbf{0.847 PR AUC}, surpassing Random Forest. Performances for almost all classes improved, with \textit{tvEpisode} reaching 0.99 F1. The lowest F1 score, excluding \textit{tvShort}, is 0.688 for \textit{tvMovie}. 
+The PR curves in Fig. \ref{fig:lightgbm_pr_curves.png} also highlight the improvement for the minority class \textit{tvSpecial}, which indeed scored 0.747 F1 (vs 0.667 for Random Forest).
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/lightgbm_pr_curves.png}
+    \caption{PR curves for \textit{titleType} (LightGBM).}
+    \label{fig:lightgbm_pr_curves.png}
+\end{figure}
+
+Looking at the feature importance (Fig. \ref{fig:lightgbm_feat_impo_tt.png}), the top three most important features are the same as for Random forest, except that genre \textit{Short} is slightly more important than \textit{canHaveEpisodes}, and that \textit{runtimeMinutes} by far the most significant. 
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/lightgbm_feat_impo_tt.png}
+    \caption{Top 10 most important features for \textit{titleType} (LightGBM).}
+    \label{fig:lightgbm_feat_impo_tt.png}
+\end{figure}
 
 \subsection{Multilayer Perceptron}
 
