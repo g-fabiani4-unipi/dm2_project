@@ -206,8 +206,9 @@ The total number of final features is 27; they are listed in Tables \ref{tab:dat
 
 
 \subsection{Handling Missing Values}
+\label{handling_nan}
 At this point, we still have missing values for \textit{countryOfOrigin}, \textit{region}, \textit{genres}, \textit{runtimeMinutes} and \textit{writerCredits}; some were preexisting, others were removed as detailed Subsec. \ref{numeric_vars_analysis}.
-Since the distribution of \textit{runtimeMinutes} depends on \textit{titleType}, and the same holds true for \textit{writerCredits}, we imputed their missing values using the median value within each respective class.
+Since the distribution of \textit{runtimeMinutes} depends on \textit{titleType} (cf. Fig \ref{fig:boxplot_runtime_tts}), and the same holds true for \textit{writerCredits}, we imputed their missing values using the median value within each respective class.
 
 On the other hand, we chose not to replace missing values for \textit{genres}, \textit{region} or \textit{countryOfOrigin}. They can easily be handled when performing the encoding for our methods without introducing bias, therefore we'd rather preserve the original distributions and correlations.
 
@@ -217,6 +218,13 @@ On the other hand, we chose not to replace missing values for \textit{genres}, \
 %    \caption{Hierarchical clustering results on tabular data by runtime and number of votes.}
 %    \label{fig:tabular_clustering}
 %\end{figure*}
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/boxplot_runtime_by_titleType.png}
+    \caption{Distribution of runtimes across \textit{titleTypes}.}
+    \label{fig:boxplot_runtime_tts}
+\end{figure}
+
 
 \subsection{Clustering}
 \begin{figure}

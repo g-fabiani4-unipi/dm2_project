@@ -36,7 +36,7 @@ The 15 most important features are reported in Fig. \ref{fig:LR_feat_impo_tt.png
 
 \begin{figure}
     \includegraphics[width=\columnwidth]{../results/images/LR_feat_impo_tt.png}
-    \caption{Top 15 most important features for \textit{titleType}}
+    \caption{Top 15 most important features for \textit{titleType} (LR).}
     \label{fig:LR_feat_impo_tt.png}
 \end{figure}
 
@@ -44,7 +44,7 @@ The 15 most important features are reported in Fig. \ref{fig:LR_feat_impo_tt.png
 For Support Vector Machines (SVMs), we scaled numerical features using RobustScaler. We tested the linear kernel and the Radial Basis Function kernel separately to exploit sklearn's optimized LinearSVC implementation.
 
 \subsubsection{Rating}
-For LinearSVC, we tested the following parameter grid using a 5-fold cross validation:
+For LinearSVC, we tested the following parameter grid using a grid search with 5-fold cross validation:
 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,
                    escapeinside={(*@}{@*)}]
@@ -74,7 +74,7 @@ The overall most important features are the same (\textit{canHaveEpisodes} and g
 Unexpectedly, the most important feature for the \textit{titleType} \textit{short} is now \textit{canHaveEpisodes}, with quite an 'advantage' (coef: -2.18, vs genre \textit{Short} 1.43).
 
 \subsection{Support Vector Machine with Radial Basis Function (RBF)}
-The power of SVMs comes at a high computational cost, which is why we only tested one kernel function (RBF) and why we opted for an 80/20 holdout, instead of a k-fold cross-validation, to carry out hyperparameter tuning. We also chose a small parameter grid to test out: 
+The power of SVMs comes at a high computational cost, which is why we only tested one kernel function (RBF) and why we opted for an 80/20 holdout, instead of a k-fold cross-validation, to carry out hyperparameter tuning. We also defined a small hyperparameter grid: 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,
                    escapeinside={(*@}{@*)}]
   { 'C': [0.1, 1, 10],
@@ -84,18 +84,18 @@ The power of SVMs comes at a high computational cost, which is why we only teste
 
 \subsubsection{Rating}
 The best model returned by the grid search had the following hyperparameters: \texttt{{'C': 10, 'gamma': 0.1, 'class\_weight': None}}. It achieved a macro F1 of 0.265 on the validation set and of 0.698 on the training set, suggesting overfitting.
-We therefore reran the grid search, excluding the highest values for C and gamma in order to increase regularization. The best performing model was less overfitted, but also achieved lower results (macro F1 0.206 for validation and 0.316 for training). Its parameters are \texttt{'C': 1, 'class\_weight': 'balanced', 'gamma': 'scale'}.
+We therefore reran the grid search, excluding the highest values for C and gamma in order to increase regularization. The best performing model was less overfitted, but also achieved lower results (macro F1 0.206 for validation and 0.316 for training). Its parameters are: \texttt{'C': 1, 'class\_weight': 'balanced', 'gamma': 'scale'}.
 
 On the test set, the overfitted model proved to be the best one, achieving a \textbf{macro F1} of \textbf{0.257} (vs 0.219) and an \textbf{accuracy} of \textbf{0.431} (vs 0.314). The resulting \textbf{PR AUC }is \textbf{0.231}. This model is also the best performing one thus far, with improvements observed across almost all classes.
 
 Looking at the confusion matrix, we can see that the model doesn't completely snub lower support classes, like Logistic Regression did, but is more accurate than LinearSVC. Especially for the more popular (and better performing) classes, confusion is mostly among neighboring classes.
 
 \subsubsection{Title Type}
-Similarly to what had happened with \textit{rating}, the first grid search returned an overfitted model (macro F1 for validation: 0.746, vs for training: 0.905). Forcing regularization resulted in less overfitting, but much poorer performances (validation macro F1: 0.206, train macro F1: 0.316); for this reason, we chose the first classifier. Its parameters are: \texttt{'C': 10, 'class\_weight': None, 'gamma': 'scale'}.
+Similarly to what had happened with \textit{rating}, the first grid search returned an overfitted model (macro F1 for validation: 0.746, vs for training: 0.905). Forcing regularization resulted in less overfitting, but also in a much poorer performance (validation macro F1: 0.206, train macro F1: 0.316); for this reason, we chose the first classifier. Its parameters are: \texttt{'C': 10, 'class\_weight': None, 'gamma': 'scale'}.
 
 On the test set, this model clears all previous attempts, with a \textbf{macro F1} of \textbf{0.746} and an \textbf{accuracy} of \textbf{0.938}.
 
-The performances for all classes increased. \textbf{tvEpisode} now achieves an F1 of 0.99; \textbf{videogame} improved greatly, reaching 0.884 F1. Nevertheless, we only get a \textbf{PR AUC} of \textbf{0.689}; indeed, the curves in Fig. \ref{fig:pr_svm_rbf_tt.png} show how the precision for half of the classes sinks at around 60\% recall. This means that while the model shows excellent performance metrics on a per-class basis, it has difficulty maintaining a reliable performance when attempting to comprehensively identify instances of minority classes.
+The performances for all classes increased. \textit{tvEpisode} now achieves an F1 of 0.99; \textit{videogame} improved greatly, reaching 0.884 F1. Nevertheless, we only get a \textbf{PR AUC} of \textbf{0.689}; indeed, the curves in Fig. \ref{fig:pr_svm_rbf_tt.png} show how the precision for half of the classes sinks at around 60\% recall. This means that while the model shows excellent performance metrics on a per-class basis, it has difficulty maintaining a reliable performance when attempting to comprehensively identify instances of minority classes.
 
 \begin{figure}
     \includegraphics[width=\columnwidth]{../results/images/pr_svm_rbf_tt.png}
@@ -104,6 +104,70 @@ The performances for all classes increased. \textbf{tvEpisode} now achieves an F
 \end{figure}
 
 \subsection{Random Forest}
+Since this method is based on trees, no scaling is needed for numerical features. To cut computational costs, we used 3-fold cross validation during hyperparameter tuning.
+
+Indeed, there are many possible hyperparameters to tune. For each task, we ran three Randomized Searches, for a varying number of estimators — 100, 300 and 500, respectively. For each, we tested the same 100 random combinations of parameters from the following grid:
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,
+                   escapeinside={(*@}{@*)}]
+  { 'criterion': ["gini", "entropy"],
+    'max_depth': [None, 5, 15, 25],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 5, 10],
+    'class_weight': [None, 'balanced']  }
+\end{lstlisting}
+
+\subsubsection{Rating}
+Before proceeding with hyperparameter tuning, we first tested a Random Forest using default parameters, which yielded an average validation macro F1 of 0.296, and an even better 0.302 macro F1 score on the test set.
+
+As shown in Fig. \ref{fig:rf_comparison_n_estimators_rating.png}, the number of estimators is not a strong driver of performance. Although the performance of the other two models was very close, we chose the best model with 300 base classifiers, which yielded an average macro F1 equal to 0.308 for validation, and equal to 0.968 for train. Its parameters are: \texttt{{'n\_estimators': 300, 'min\_samples\_split': 5, 'min\_samples\_leaf': 1, 'max\_depth': None, 'criterion': 'gini', 'class\_weight': 'balanced'}}.
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/rf_comparison_n_estimators_rating.png}
+    \caption{Avg cross-validation macro F1 for different parameter configurations across varying numbers of estimators for \textit{rating} (RF).}
+    \label{fig:rf_comparison_n_estimators_rating.png}
+\end{figure}
+
+
+Whether such a gap between validation and train macro F1 should be seen as a sign of overfitting for Random Forest is debated in the literature: it has been argued that, even if the single trees can overfit, they tend to do so in different ways, and that combining them in an ensemble reduces the overall variance. Thus, although pruning the individual trees can be beneficial, unless the dataset is very simple, we could consider Random Forest as particularly robust against overfitting.
+
+The model's performance on the test set increases, making it the best model thus far: it achieves a \textbf{macro F1} of \textbf{0.325}, an \textbf{accuracy} of \textbf{0.452}, and a \textbf{PR AUC} of \textbf{0.318}.
+
+It achieves the most balanced performance, with six classes out of ten scoring an F1 >= 0.3. Confusion remains spread out for the minority classes (from 0 to 4), whereas for the others it remains concentrated amongst neighboring classes.
+
+The Mean Decrease in Impurity (MDI) returned as the most important features \textit{numVotes} and startYear (almost 0.10), followed by \textit{totalCredits} (around 0.9).
+
+\subsubsection{Title Type}
+The default model achieved an average macro F1 of 0.707 on validation and a score of 0.728 on the test set.
+
+The performances for the different parameters combinations tested during the Random Searches were again very similar, with the configurations using 100 estimators yielding marginally lower scores. Indeed, the three best models shared the same hyperparameter values. We chose the configuration with 300 trees: the validation performances were only marginally better than that of the 500-trees model, but we also favored simplicity.
+
+The model yielded 0.767 and 0.975 for validation and training, respectively. Its hyperparameter configuration is the following: \texttt{'n\_estimators': 300, 'min\_samples\_split': 10, 'min\_samples\_leaf': 1, 'max\_depth': None, 'criterion': 'entropy', 'class\_weight': 'balanced'}. 
+
+On the test set, it clears previous models, achieving \textbf{0.777 macro F1} and \textbf{0.940 accuracy}. Half of the classes yield F1 > 0.95. It generalizes better on the minority classes \textit{tvMovie} and \textit{tvMiniSeries}: although there is still confusion with the more popular \textit{movie} and \textit{tvSeries}, they are correctly classified most of the time (cf. the confusion matrix in Fig. \ref{fig:rf_conf_matrix_tt.png}).
+
+This model's superiority across decision thresholds is supported by the PR curves in Fig. \ref{fig:rf_pr_curves.png}, and further quantified by its \textbf{PR AUC} of \textbf{0.818}.
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/rf_pr_curves.png}
+    \caption{PR curves for \textit{titleType} (RF).}
+    \label{fig:rf_pr_curves.png}
+\end{figure}
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/rf_conf_matrix_tt.png}
+    \caption{Confusion matrix for \textit{titleType} (RF).}
+    \label{fig:rf_conf_matrix_tt.png}
+\end{figure}
+
+Checking the 15 most important features (Fig \ref{fig:rf_feat_impo_tt.png}), we see how the two most important features for the Logistic Regression model, \textit{canHaveEpisodes} and the genre \textit{Short}, have been overtaken by \textit{runtimeMinutes}. Indeed, we had uncovered a relationship between \textit{runtimeMinutes} and \textit{titleType} in Subsec. \ref{handling_nan}.
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/rf_feat_impo_tt.png}
+    \caption{Top 15 most important features for \textit{titleType} (RF).}
+    \label{fig:rf_feat_impo_tt.png}
+\end{figure}
+
+Finally, it's worth pointing out that prior experimentation keeping the default hyperparameter \texttt{'class\_weight': None} instead of \texttt{'balanced'} lead to a best model scoring a significantly lower macro F1 score of 0.728. This is indicative of the importance of this hyperparameter for this unbalanced task.
 
 \subsection{LightGBM}
 
