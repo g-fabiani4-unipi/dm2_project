@@ -239,6 +239,106 @@ Looking at the feature importance (Fig. \ref{fig:lightgbm_feat_impo_tt.png}), th
 \end{figure}
 
 \subsection{Multilayer Perceptron}
+As anticipated in Subsec. \ref{classification_preprocessing}, for this model, we reduced the dimensionality of the dataset to make training faster. We also scaled numerical features using RobustScaler.
 
+Since a comprehensive grid search for hyperparameter tuning would have been too computationally expensive, we ran three Randomized Searches using 80/20 holdout and 100 iterations for a varying number of hidden layers, ranging from one to three. 
+As for the size of hidden layers, we tested the following architectures, varying the number of hidden units and the decreasing patterns:
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,
+                   escapeinside={(*@}{@*)}]
+  [(32,), (64,), (128,)],
+  [(64,32), (128,64), (128,32)],
+  [(128,64,32), (64,64,32)]
+\end{lstlisting}
+
+The rest of the parameters are sampled from the following grid:
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
+  { 'activation': ['relu', 'tanh'],
+    'alpha': [0.0001, 0.001, 0.01],
+    'learning_rate_init': [0.0001, 0.001, 0.01] }
+\end{lstlisting}
+
+For both tasks, the MLPClassifier positioned itself in the lower half of the ranking. Further exploration of more advanced Deep Learning architectures is needed to better leverage the potential of Neural Networks.
+
+\subsubsection{Rating}
+We first tried using the default parameters, which yielded 0.239 macro F1 on the validation set and 0.316 on the training set, whereas on the test set it achieved 0.240 macro F1 and 0.415 accuracy.
+
+After hyperparameter tuning, the best model ended up having two hidden layers, yielding 0.262 validation macro F1 and 0.387 for training. Its parameters are: \texttt{'hidden\_layer\_sizes': (128, 64), 'learning\_rate\_init': 0.001, 'alpha': 0.01, 'activation': 'relu'}.
+
+Plotting the trade-off between the overfitting gap and the validation macro F1 (Fig. \ref{fig:nn_overfitting_tradeoff.png}) shows that the gap tends to increase as performance increases, but the relationship is not as clear as it was for LightGBM. Moreover, most underfitted models only have one layer.
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/nn_overfitting_tradeoff.png}
+    \caption{Trade-off between validation macro F1 and overfitting gap for \textit{rating} (MLP).}
+    \label{fig:nn_overfitting_tradeoff.png}
+\end{figure}
+
+On the test set, the model achieved a macro f1 of 0.244, an accuracy of 0.413 (lower than the default model), and a PR AUC of 0.244.
+
+We also tried implementing early stopping: the macro F1 sank to 0.236, but the accuracy increased slightly, reaching 0.425. 
+
+\subsubsection{TitleType}
+In this case, in terms of macro F1 the default model reaches 0.729 on the validation set, 0.857 on the training set, and 0.730 on the test set. It also achieves 0.931 test accuracy.
+
+After hyperparameter tuning, the best model turns out to be relatively simple, with just one layer and 64 hidden units. It yields a macro F1 of 0.746 on validation and 0.791 on the training set, excluding overfitting. Its hyperparameters are: \texttt{'alpha': 0.01, 'hidden\_layer\_sizes': (64,), 'learning\_rate\_init': 0.001, 'activation': 'tanh'}.
+
+Indeed, the scatterplot in Fig. \ref{fig:nn_overfitting_tradeoff_tt.png} reveals how more layers do not necessarily lead to a better performance, but they do lead to a tendency to overfit.
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/nn_overfitting_tradeoff_tt.png}
+    \caption{Trade-off between validation macro F1 and overfitting gap for \textit{titleType} (MLP).}
+    \label{fig:nn_overfitting_tradeoff_tt.png}
+\end{figure}
+
+On the test set, the model still achieves \textbf{0.738 macro F1}, coupled with \textbf{0.934 accuracy} and \textbf{0.784 PR AUC}.
+Implementing early stopping leads to a drop in macro F1 to 0.728, as it performs slightly worse on minority classes. 
 
 \subsection{Conclusions}
+The performances of the different models for the two tasks are summarized in Table \ref{tab:rating_models} and \ref{tab:titletype_models}.
+
+\begin{table}
+    \centering
+    \small
+    \renewcommand{\arraystretch}{0.9}
+    \begin{tabular}{lrrr}
+    \toprule
+    \textbf{Model} & \textbf{Macro F1} & \textbf{Accuracy} & \textbf{PR AUC} \\
+    \midrule
+    \textbf{RF}         & \textbf{0.325} & \textbf{0.452} & \textbf{0.318} \\
+    LightGBM   & 0.289 & 0.440 & 0.299 \\
+    SVM w/ RBF & 0.257 & 0.431 & 0.231 \\
+    MLP        & 0.244 & 0.413 & 0.244 \\
+    LinearSVM  & 0.158 & 0.270 & 0.175 \\
+    LR         & 0.145 & 0.388 & 0.193 \\
+    \bottomrule
+    \end{tabular}
+    \caption{Performance comparison of different models on \textit{rating}.}
+    \label{tab:rating_models}
+\end{table}
+
+\begin{table}
+    \centering
+    \small
+    \renewcommand{\arraystretch}{0.9}
+    \begin{tabular}{lrrr}
+    \toprule
+    \textbf{Model} & \textbf{Macro F1} & \textbf{Accuracy} & \textbf{PR AUC} \\
+    \midrule
+    \textbf{LightGBM}   & \textbf{0.795} & \textbf{0.949} & \textbf{0.847} \\
+    RF         & 0.777 & 0.940 & 0.818 \\
+    SVM w/ RBF & 0.746 & 0.938 & 0.689 \\
+    MLP        & 0.738 & 0.934 & 0.784 \\
+    LR         & 0.649 & 0.908 & 0.704 \\
+    LinearSVM  & 0.640 & 0.889 & 0.674 \\
+    \bottomrule
+    \end{tabular}
+    \caption{Performance comparison of different models on \textit{titleType}.}
+    \label{tab:titletype_models}
+\end{table}
+
+As anticipated, the task of predicting \textit{titleType} yielded better results across models, which, just like for DM1, is likely due to better class separability and stronger feature association.
+
+All models achieved great results for the more popular classes, with an F1 around 0.9, while the results for the minority classes varied from around 0.4 to a robust 0.7 for the best models. In particular, the best models achieved great results for \textit{videogame}, and were better at separating \textit{tvMovie} and \textit{tvMiniSeries} from their more popular counterparts, \textit{movie} and \textit{tvSeries}. Ensemble methods have clearly outperformed the rest.
+
+With regard to \textit{rating}, the performance of every model reflects the class distribution, which resembles a left-skewed Gaussian: performances peak for class (7,8], the mode, and quickly degrade. The models do not have a chance to generalize on the lowest and the highest classes, especially those in the 'tail', due to lack of representation. The best models, however, managed to concentrate their confusion on neighboring classes, especially around the peak of the distribution.
+
+Finally, there have been some challenges tied to overfitting; future work could explore undersampling and oversampling techniques to improve generalization.
