@@ -105,7 +105,7 @@ We log-transformed all right-skewed variables, and used the Shapiro-Wilk test to
 \end{figure}
 
 We removed the following features because they were highly correlated to another feature: \textit{awardNominationsExcludeWins} (0.86, correlated with \textit{awardsAndNominations}), \textit{castNumber} (0.74, with \textit{totalCredits}).
-Since all features regarding reviews and \textit{numVotes} were highly correlated with each other, we dropped them all with the exception of \textit{numVotes}, which has the least skewed distribution, and \textit{criticReviewsRatio}, which offer insights of a different nature. We however decided to conserve information about the presence/absence of reviews by users and critics with the creation of two new boolean features: \textit{hasUserReviews} and textit{hasCriticsReviews}.
+Since all features regarding reviews and \textit{numVotes} were highly correlated with each other, we dropped them all with the exception of \textit{numVotes}, which has the least skewed distribution, and \textit{criticReviewsRatio}, which offer insights of a different nature. We however decided to conserve information about the presence/absence of reviews by users and critics with the creation of two new boolean features: \textit{hasUserReviews} and \textit{hasCriticsReviews}.
 
 Moreover, we binarized features which overwhelmingly took on the value 0 (or 1, in the case of \textit{numCountriesOfOrigin} and \textit{directorsCredits}). The results of these transformations are reported in Table \ref{tab:binarized_features}.
 
@@ -213,7 +213,8 @@ On the other hand, we chose not to replace missing values for \textit{genres}, \
 
 \subsection{Clustering}
 \begin{figure*}
-    \includegraphics[width=\textwidth]{../results/images//understanding_clustering.png}
+    \center
+    \includegraphics[width=.8\textwidth]{../results/images//understanding_clustering.png}
     \caption{Hierarchical clustering results on tabular data by runtime and number of votes.}
     \label{fig:tabular_clustering}
 \end{figure*}

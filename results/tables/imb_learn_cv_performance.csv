@@ -1,8 +1,9 @@
-Resampling Method,accuracy,precision,recall,f1,average precision
-No strategy,0.91 $\pm$ 0.00,0.47 $\pm$ 0.02,0.31 $\pm$ 0.01,0.37 $\pm$ 0.01,0.32 $\pm$ 0.01
-Random Oversampling,0.85 $\pm$ 0.00,0.29 $\pm$ 0.00,0.62 $\pm$ 0.01,0.40 $\pm$ 0.01,0.27 $\pm$ 0.01
-SMOTE,0.84 $\pm$ 0.00,0.29 $\pm$ 0.00,0.65 $\pm$ 0.01,0.40 $\pm$ 0.01,0.30 $\pm$ 0.01
-ADASYN,0.85 $\pm$ 0.00,0.30 $\pm$ 0.00,0.59 $\pm$ 0.01,0.40 $\pm$ 0.00,0.26 $\pm$ 0.01
-Random Undersampling,0.76 $\pm$ 0.00,0.24 $\pm$ 0.00,0.86 $\pm$ 0.01,0.37 $\pm$ 0.00,0.41 $\pm$ 0.01
-Edited NN,0.92 $\pm$ 0.00,0.50 $\pm$ 0.01,0.45 $\pm$ 0.01,0.47 $\pm$ 0.01,0.47 $\pm$ 0.01
-SMOTE + Edited NN,0.84 $\pm$ 0.00,0.30 $\pm$ 0.01,0.68 $\pm$ 0.01,0.41 $\pm$ 0.01,0.23 $\pm$ 0.01
+Resampling Method,precision,recall,f1
+No strategy,.47 $\pm$ .02,.31 $\pm$ .01,.37 $\pm$ .01
+Random Over-sampl.,.29 $\pm$ .00,.62 $\pm$ .01,.40 $\pm$ .01
+SMOTE,.29 $\pm$ .00,.65 $\pm$ .01,.40 $\pm$ .01
+ADASYN,.30 $\pm$ .00,.59 $\pm$ .01,.40 $\pm$ .00
+Random Under-sampl.,.24 $\pm$ .00,.86 $\pm$ .01,.37 $\pm$ .00
+Edited NN,.50 $\pm$ .01,.45 $\pm$ .01,.47 $\pm$ .01
+SMOTE + Edited NN,.30 $\pm$ .01,.68 $\pm$ .01,.41 $\pm$ .01
+One Class SVM,.10 $\mp$ .00,.62 $\pm$ .01,.17 $\pm$ .00
