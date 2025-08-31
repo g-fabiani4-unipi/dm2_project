@@ -2,7 +2,9 @@
 
 In this section we with several imbalance learning techniques in the context of binary classification.
 Our goal was to develop a system that is capable of predicting which titles have received any awards (as already seen in \ref{tab:binarized_features}, only about 8\% our training records did).
-We figured that a similar system could be useful in a number of contexts, like for recommendation and showcasing purposes or for streaming platforms attempting to decide which titles to license when this information isn't already available (for example for newly released titles).
+We can imagine that a similar system could be useful in a number of contexts, like for recommendation and showcasing purposes or for streaming platforms attempting to decide which titles to license when this information isn't already available (for example for newly released titles).
+
+In our evaluation of different techniques, we decided to relay on the F1 score of the positive class, since we figured that from a business perspective it was equally important detecting as many award worthy titles as possible and avoiding false positives.
 
 \subsubsection{Resampling techniques}
 
@@ -11,9 +13,9 @@ We then experimented with three over-sampling strategies (Random Over-sampling, 
 
 For each technique we fine tuned the hyperparameters of the classifier searching for the best F1 score: initially we performed random seach on ks between 1 and 100, with euclidean and manhattan distance, both weighting neighbors and not. Since we noticed generally better performance with weighting of exemplars, we removed unweighted models from the grid search.
 
-We also noticed that for over-sampling methods performance was rapidly decreasing as k  got bigger, so we restricted our grid search to odd ks between 1 and 21. Since performance of under-sampling techniques wasn't degrading so rapidly, we extended the number of neighbors considered for these approaches to odd numbers between 1 and 41, but we noticed that scores were nevertheless plateauing around 10, so we didn't consider it necessary to widen the search beyond that.
+We also noticed that for over-sampling methods performance was rapidly decreasing as k  got bigger, so we restricted our grid search to odd ks between 1 and 21. Since performance of under-sampling techniques wasn't degrading so rapidly, we extended the number of neighbors considered for these approaches to odd numbers between 1 and 41, but we noticed that scores were plateauing around 10, so we didn't consider it necessary to widen the search beyond that.
 
-We then compared performance of different resampling strategies checking precision, recall and F1 score on 5-fold cross validation (cf \ref{tab:imb_learn_cv_performance}).
+We then compared performance of different resampling strategies checking precision, recall and F1 score on 5-fold cross validation (cf fig \ref{tab:imb_learn_cv_performance}).
 
 \begin{table}
     \footnotesize
@@ -25,6 +27,7 @@ We then compared performance of different resampling strategies checking precisi
 Precious insights were also gathered by the inspection of the precision-recall curves (reported in fig \ref{fig:imb_learn_cv_pr}) and average precision.
 
 \begin{figure*}
+    \center
     \includegraphics[width=.8\textwidth]{../results/images/imb_learn_cv_pr.png}
     \caption{Precision-Recall curves on 5-fold cross-validation for different resampling methods}
     \label{fig:imb_learn_cv_pr}
@@ -52,3 +55,11 @@ Fig \ref{fig:imb_learn_threshold} illustrates the effect of changing the decisio
 \end{figure}
 
 We finally assessed both models on the test set, obtaining very similar results: ENN obtained a F1 score of 0.49, while Random Under-sampling 0.47; inspecting the other metrics we can confirm that the worse performance of Random Under-sampling is entirely due to a lower precision (0.42 vs 0.44 for ENN), as we had expected from the inspection of the PR curves in validation.
+
+\subsubsection{Exploration of alternative techniques}
+As we detailed in \ref{sec:anomaly_detection}, records that have received awards and nominations were often deemed anomalous.
+We decided to leverage this observation adopting a classification based anomaly detection technique for our classification task.
+
+We trained a One Class SVM with RBF kernel without hyperparameter tuning on records that didn't receive any awards in order to learn a discriminative boundary around normal instances.
+Table \ref{tab:imb_learn_cv_performance} show results obtained by this method on 5-fold cross validation.
+We ultimately deemed the performance of this method unsatisfactory because it produced too many false positives.
