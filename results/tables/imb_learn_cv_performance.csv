@@ -1,4 +1,4 @@
-Resampling Method,precision,recall,f1
+Method,precision,recall,f1
 No strategy,.47 $\pm$ .02,.31 $\pm$ .01,.37 $\pm$ .01
 Random Over-sampl.,.29 $\pm$ .00,.62 $\pm$ .01,.40 $\pm$ .01
 SMOTE,.29 $\pm$ .00,.65 $\pm$ .01,.40 $\pm$ .01
