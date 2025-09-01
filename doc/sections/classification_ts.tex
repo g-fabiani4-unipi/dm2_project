@@ -38,6 +38,7 @@ Overall our models demonstrated great sensibility to the number of neighbors, ei
 
 Impact of the presence of warping and warping constraints was generally negligible, with euclidean distance performing better on the binary classification task.
 Even when warping impacted positively the model performance (for the multi-class problem), the improvement was negligible when considering the score variance across folds.
+This is probably evidence that our time series are generally well aligned, which is both evident by visualizations of the signal and consistent with our domain knowledge: as a matter of fact, considering that these time series show day-of-week seasonality and that movies are most often released on Friday, we would expect major peaks and valleys to be reasonably in sync.
 
 When evaluating our models on 5-fold stratified cross validation, we found that all of them were able to clear the respective baselines without problems.
 In particular, even without tuning the decision threshold our classifier obtained precision, recall and f1 all over 0.5 on the binary classification task.
@@ -76,6 +77,70 @@ On 5-fold cross validation, TSF and drCIF demonstrated performances comparable t
 It is possible that drCIF performance, which is practically indistinguishable from that of TSF, was hindered by our choice to limit the number of estimators considered.
 
 \subsubsection{Shapelets}
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/rst_shapelets.png}
+    \caption{Shapelets extracted by Random Shapelet Transformer (shapelets for the positive class in orange).}\label{fig:rst_shapelets}
+\end{figure}
+
+At last, we approached the binary classification task with two different approaches to shapelet-based classification.
+
+In the first case we used a random shapelet transformer in order to extract the 10 most discriminative shapelets from 1000 random candidate subsequences and trained a random forest on the representation returned from the transformer.
+For the transformer, we experimented with different maximum shapelet length, that were informed by previous analysis on motifs and our experience with interval based classifiers; therefore we run a grid search on maximum length 14, 28, 50 and the degenerate case of accepting the entire time series as a subsequence.
+We found that 50 returned the best results in terms of average precision.
+In cross validation this classifier was the second best after the classifier based on Catch22 features, with an average precision of 0.62.
+
+We also analyzed the extracted shapelets, that are visualized at fig. \ref{fig:rst_shapelets}.
+We can notice that most of them have a length around 14 timestamps and as such they are able to capture patterns occurring in the course of a week.
+On the other hand it can be somewhat difficult interpreting the subtle distinctions that make these shapeletes particularly discriminative for the current task.
+For example: three of the extracted shapelets show a pretty similar pattern, with major weekend peak around the sixth timestamp and a minor peak some time later, certainly to be attributed to people that go to the movie theater on Tuesday in order to beat the crowd and get discounted tickets.
+However, one of these is associated with the positive class, while the other two with the negative class.
+While the general context for these patterns is clear, the subtle differences that make them contribute to a correct classification escape us.
+
+Our second approach was to leverage the 20 shapelets extracted from the matrix profile as detailed in \ref{sec:motifs}.
+
+We initially attempted to find the top shapelets from our initial set using recursive feature elimination to determine the ranking of all features and then testing the same Decision Tree classifier on the top n features in order to determine the optimal selection.
+However, since the performance with this approach was not very impressive (average precision of 0.4), we decided to retain all candidate shapelets and adopt a Random Forest Classifier.
+Results obtained with Random Forest were much better (although, not at the levels reached by RST), reaching an average precision of 0.55.
+
+After training the model on the entire test set, we inspected the shapelets with higher importance.
+The four top shapelets were all extracted from the negative class: this made sense to us, since, as we noticed during clustering, `late bloomers', that have a very distinctive shape when compared with the rest of the dataset, tend not to be action movies.
+
+Fig \ref{fig:mp_shapelet} shows one of the top shapelets: we can notice two major weekend peaks with a positive trend; this is indeed a very distinctive pattern for `late bloomers'that doesn't occur in instant hits, that, on the contrary have a negative trend with top profits in the first few days after release.
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/mp_shapelet.png}
+    \caption{Shapelet extracted from Matrix Profile.}\label{fig:mp_shapelet}
+\end{figure}
 
 
 \subsubsection{Assessment}
+For our assessment, we evaluated the performance of the Catch22 RF and of TSF on the test set.
+For the binary classification task, shapelet based models were also included.
+
+For the binary classification we tuned the decision threshold of each model with 5-fold cross validation on the training set before evaluating it on the test set.
+
+Catch22 RF and RSF performed very similarly on the test set, obtaining the same F1 score for the positive class (0.61) albeit with a different trade off between precision and recall (RSF had higher precision).
+From the PR curves in fig \ref{fig:ts_clf_test_pr} we can observe that, while all considered classifiers have a similar performance, Catch22 RF demonstrated better ranking capabilities, better in terms of average precision and of stability of the PR curve.
+
+We also tested the model that is using manually extracted shapelets, not because it showed impressive performance in validation (it did not), but because we wanted to confirm our hypothesis that this model overfitted the validation set, since we performed shapelet extraction on the entire training set.
+Surely enough, average precision showed degradation on the test set (decreasing to 0.52), and in particular produced more top ranked false positives than during cross validation.
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/ts_clf_test_pr.png}
+    \caption{Precision-Recall curves for the action classification task on test set.}\label{fig:ts_clf_test_pr}
+\end{figure}
+
+For the multi-class problem, the best performance came from Catch22 RF, which obtained a macro F1 of 0.34 (0.7 higher than the contender), and showed consistently better performance than TSF on all classes.
+Inspecting the confusion matrix in fig. \ref{fig:ts_clf_test_conf_mat}, we can see that our model performs the best on classes with the highest support (High and Medium), while both Medium High and Medium Low are frequently misclassified with as Medium. Low has 0 recall.
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/ts_clf_test_conf_mat.png}
+    \caption{Confusion matrix for C22 classifier on the test set.}\label{fig:ts_clf_test_conf_mat}
+\end{figure}
+
+Catch22 RF was also the best regressor: with a mean squared error of 0.55 (much lower than the target variable variance) and a coefficient of determination of 0.34 (TSF reached .29).
+From fig. \ref{fig:ts_clf_test_scatter} we can see that, although predicted values are squeezed towards the mean, still they display a positive linear correlation with actual values (Pearson R 0.58, p value < 0.01).
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/ts_clf_test_scatter.png}
+    \caption{Relationship between real ratings and rating predicted by the C22 regressor during testing.}\label{fig:ts_clf_test_scatter}
+\end{figure}
