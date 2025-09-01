@@ -128,7 +128,7 @@ As shown in Fig. \ref{fig:rf_comparison_n_estimators_rating.png}, the number of 
 \end{figure}
 
 
-Whether such a gap between validation and train macro F1 should be seen as a sign of overfitting for Random Forest is debated in the literature: it has been argued that, even if the single trees can overfit, they tend to do so in different ways, and that combining them in an ensemble reduces the overall variance. Thus, although pruning the individual trees can be beneficial, unless the dataset is very simple, we could consider Random Forest as particularly robust against overfitting.
+Whether such a gap between validation and train macro F1 should be interpreted as a sign of overfitting for Random Forest is debated in the literature: it has been argued that, even if the single trees can overfit, they tend to do so in different ways, and that combining them in an ensemble reduces the overall variance. Thus, although pruning the individual trees can be beneficial, unless the dataset is very simple, we could consider Random Forest as particularly robust against overfitting.
 
 The model's performance on the test set increases, making it the best model thus far: it achieves a \textbf{macro F1} of \textbf{0.325}, an \textbf{accuracy} of \textbf{0.452}, and a \textbf{PR AUC} of \textbf{0.318}.
 
