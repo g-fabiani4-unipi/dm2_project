@@ -21,7 +21,7 @@ We also inspected the distribution of the binned version of rating, finding a co
     \caption{Distribution of rating category in the Time Series dataset.}\label{fig:ts_rating_distribution}
 \end{figure}
 
-\subsubsection{Bivariate analysis of variables}
+\subsubsection{Multivariate analysis of variables}
 \begin{figure}
     \includegraphics[width=\columnwidth]{../results/images/ts_feat_correlation.png}
     \caption{Correlation of numeric features.}\label{fig:ts_feat_correlation}
@@ -52,4 +52,4 @@ Surely enough, when we finally checked against the original data on Box Office M
 
 In addition to this discovery, we also were able to observe that, while most movies have profits well over the mean in the first several days after release, some others got a slow start at the box office.
 We were able to identify 145 movies that performed below average in the first day of box office. While this is a very coarse distinction, which incurs in some false positives, it was later confirmed by clustering.
-In addition to lower box office profits in the first days after release, movies of this second type show no clear linear trend (in opposition to the negative trend observed for other movies) and tend to peak on the third weekend after release. We also observed that these were not, for the most part (93\%), action movies.
+In addition to lower box office profits in the first days after release, these `late bloomers' show no clear linear trend (in opposition to the negative trend observed for other movies) and tend to peak on the third weekend after release. We also observed that these were not, for the most part (93\%), action movies.
