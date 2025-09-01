@@ -1,1 +1,37 @@
 \section{Explainability: SHAP}
+In this section, we'll expand the global overview on feature importance returned by the Random Forest model with local explanations of meaningful records returned by SHAP. In particular, we used Tree SHAP, as it is designed for ensembles of trees. Since it produced more meaningful results, we focused on the \textit{titleType} task.
+
+Initially, our plan was to compute SHAP values for the entire test set and run K-Means on the explanations, in order to focus our analysis on the centroids or medoids, i.e. the 'prototypical' explanations. However, this approach proved to be too computationally expensive. 
+We therefore decided to only compute the SHAP values for 'prototypical' instances of the test set. In order to do that, we ran K-Means on the test set and we approximated the medoids by selecting the test instances closest to the centroids. For simplicity, we clustered the data using only numerical features, scaled with RobustScaler. We employed the elbow method to determine the optimal value of clusters, which resulted in k = 13.
+
+Twelve out of the 13 instances either belonged to or were classified as one of the top three \textit{titleTypes}: \textit{movie}, \textit{tvEpisode} and \textit{short}. Three instances were misclassified. Overall, we find that \textit{runtimeMinutes} is the most important feature for almost all records, confirming what anticipated by the Random Forest Gain importance (cf. Fig. \ref{fig:rf_feat_impo_tt.png}).
+
+All four \textit{\textbf{tvEpisodes}} were correctly classified. For all of them, the most important feature was \textit{runtimeMinutes}, except for the only one that was classified with 100\% confidence, Medoid n. 5: the biggest contribution, with +0.29, has been made by \textit{numRegions} (cf. Fig \ref{fig:shap_medoid_5.png}). Looking at the record's values, \textit{numRegions} is set to zero: we assume this lack of information is preponderant among \textit{tvEpisodes} in the dataset, therefore the model has overfitted on it. This also rings true for \textit{regions}: the feature \textit{regions\_Other} has a negative contribution for those \textit{tvEpisodes} which \textit{do} have a country for \textit{regions}, positive otherwise.
+
+Medoids n. 8 and n. 9 are \textit{\textbf{shorts}}: both have as most important feature the genre \textit{Short} (+0.28 and +0.23, respectively), followed by \textit{runtimeMinutes} (+0.15 and +0.19) and \textit{canHaveEpisodes} (+0.06 and +0.04). They were confidently classified, with 97.7\% and 87.3\% probability.
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/shap_medoid_5.png}
+    \caption{Waterfall plot for medoid n. 5 (correct \textit{tvEpisode}, 100\% confidence).}
+    \label{fig:shap_medoid_5.png}
+\end{figure}
+
+All four correctly classified \textbf{\textit{movies}} have high probability (>80\%); their two most important features are \textit{runtimeMinutes}, with a contribution between +0.2 and +0.29, followed by \textit{canHaveEpisodes} (around 0.07; of course all records had a negative value). 
+
+The following instances were misclassified:
+\begin{itemize}
+    \item Medoid 1: classified as \textit{tvMovie} (50.9\%) instead of \textit{video} (10.4\%) ;
+    \item Medoid 3: classified as movie (83\%) instead of \textit{tvMovie} (11.4\%);
+    \item Medoid 11: classified as movie (95.2\%) instead of \textit{tvMovie} (3.5\%);
+\end{itemize}
+
+As for Medoid 3 and 11, the misclassification is quite confident: as we know, this minority class tends to be confused for its more popular counterpart. Their waterfall plot for the class \textit{movie} is similar to the ones discussed above. Looking at the waterfall plots for their real target class, we see that both records are mostly affected by the sum of small negative contributions of the remaining features. Interestingly, both have as main negative feature \textit{criticReviewsRatio} (-0.02 and -0.03): they have relatively high values (50\% and 70\%), which the model might have learned to be unusual for this type of TV product. Focusing on Medoid 11 (Fig. \ref{fig:shap_medoid_11_true_label.png}), we can infer that \textit{externalLinks} has an important negative contribution towards \textit{tvMovie} for the same reason. Not as easily interpretable is the negative contribution of the fact that its \textit{countryOfOrigin} is the US, as it is also negative for Medoid 3, which was produced in Germany: there might be an interaction of features at play for this decision.
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/shap_medoid_11_true_label.png}
+    \caption{Waterfall plot for medoid n. 11 for its correct label \textit{tvMovie} (3.5\% confidence).}
+    \label{fig:shap_medoid_11_true_label.png}
+\end{figure}
+
+For Medoid 1, on the other hand, the black box was not as confident. The biggest singular positive contributions towards \textit{tvMovie} were made by \textit{runtimeMinutes} and \textit{writerCredits} (+0.06), though the probability was mostly influenced by the sum of many smaller positive contributions.
+W.r.t. the true label \textit{video}, the biggest negative contributions are due to the fact that the title was produced and distributed in the US (-0.03 and -0.02), and the fact that it isn't tagged as genre \textit{Adult} (-0.02).
