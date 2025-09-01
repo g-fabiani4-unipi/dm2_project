@@ -1,5 +1,5 @@
-Model,mean_squared_error,R2
-KNN,0.69 $\pm$ 0.11,0.14 $\pm$ 0.07
-C22 RF,0.58 $\pm$ 0.08,0.27 $\pm$ 0.9
-TSF,0.62 $\pm$ 0.01,0.22 $\pm$ 0.08
-drCIF,0.60 $\pm$ 0.06,0.23 $\pm$ 0.13
+Model,mean squared error,R2
+KNN,.69 $\pm$ .11,.14 $\pm$ .07
+C22 RF,.58 $\pm$ .08,.27 $\pm$ 0.9
+TSF,.62 $\pm$ .01,.22 $\pm$ .08
+drCIF,.60 $\pm$ .06,.23 $\pm$ .13

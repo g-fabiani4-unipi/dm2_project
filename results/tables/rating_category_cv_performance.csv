@@ -1,7 +1,7 @@
-Model,accuracy,macro_precision,macro_recall,macro_f1
-baseline,0.30 $\pm$ 0.02,0.21 $\pm$ 0.01,0.21 $\pm$ 0.01,0.21 $\pm$ 0.01
-KNN,0.43 $\pm$ 0.03,0.33 $\pm$ 0.06,0.28 $\pm$ 0.02,0.27s $\pm$ 0.02
-C22 RF,0.45 $\pm$ 0.04,0.32 $\pm$ 0.05,0.30 $\pm$ 0.03,0.28 $\pm$ 0.03
-TSF,0.43 $\pm$ 0.04,0.31 $\pm$ 0.04, 0.29 $\pm$ 0.03,0.29 $\pm$ 0.03
-drCIF,0.46 $\mp$ 0.05,0.35 $\pm$ 0.04,0.32 $\pm$ 0.03,0.31 $\pm$ 0.03
-Proximity Forest,0.42,0.29,0.27,0.26
+Model,accuracy,precision (macro),recall (macro),f1 (macro)
+baseline,.30 $\pm$ .02,.21 $\pm$ .01,.21 $\pm$ .01,.21 $\pm$ .01
+KNN,.43 $\pm$ .03,.33 $\pm$ .06,.28 $\pm$ .02,.27 $\pm$ .02
+C22 RF,.45 $\pm$ .04,.32 $\pm$ .05,.30 $\pm$ .03,.28 $\pm$ .03
+TSF,.43 $\pm$ .04,.31 $\pm$ .04,.29 $\pm$ .03,.29 $\pm$ .03
+drCIF,.46 $\pm$ .05,.35 $\pm$ .04,.32 $\pm$ .03,.31 $\pm$ .03
+Proximity Forest,.42,.29,.27,.26
