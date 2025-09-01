@@ -1,9 +1,68 @@
-In this section, we will discuss the performance of two advanced regression methods in predicting the \textit{averageRating}.
+In this section, we will discuss the performance of two advanced regression methods in predicting the \textit{averageRating}, Random Forest and XGBoost.
 
-We used the same preprocessing pipeline detailed in Subsec. \ref{classification_preprocessing} and the feature set we had used for the Multilayer Perceptron.
+We used the same preprocessing pipeline detailed in Subsec. \ref{classification_preprocessing} and the feature set we had used for the Multilayer Perceptron, detailed in Subsec. \ref{classification_preprocessing}. As both methods are based on trees, numerical features did not require scaling.
 
 We evaluated performances using the Determination Coefficient (R2) and the Mean Squared Error (MSE). To set a baseline, we used a DummyRegressor which always predicts the mean of the target values observed in the training set, which yielded a \textbf{R2} of \textbf{0} and a \textbf{MSE} of \textbf{1.819} (equal to the variance of the target variable).
 
 \subsection{Random Forest Regressor}
+To tune our model, we used Randomized Search with 3-fold cross-validation and tested 100 random combinations from the following grid for 100, 300 and 500 base models:
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,
+                   escapeinside={(*@}{@*)}]
+  { 'n_estimators': [100],
+    'max_depth': [None, 5, 15, 25],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 5, 10],
+    'max_features': [None, 'log2', 'sqrt', 0.5]  }
+\end{lstlisting}
+
+Comparing the average validation R2 and the overfitting gap among parameter combinations that differ only in the number of estimators, no significant differences emerge. 
+The scatterplot in Fig. \ref{fig:rf_regressor_overfitting.png} illustrates an exponential relationship between the overfitting gap (defined as the difference between the average training and validation R2) and the performance of the regressors (i.e. its average validation R2). This pattern is similar to the one we had observed for classification.
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/rf_regressor_overfitting.png}
+    \caption{Trade-off between avg validation R2 and overfitting gap for \textit{averageRating} (RF Regressor).}
+    \label{fig:rf_regressor_overfitting.png}
+\end{figure}
+
+The best model had the following hyperparameters: \texttt{'n\_estimators': 500, 'min\_samples\_split': 2, 'min\_samples\_leaf': 1, 'max\_features': 0.5, 'max\_depth': None}. Its results were only marginally better than the best 300-trees configuration. It yielded 0.424 average validation R2 (vs 0.921 on the training set) and 1.047 MSE (vs 0.144 on the training set). The same considerations made about classification for Random Forest and overfitting apply for regression.
+
+On the test set, the model achieved an \textbf{R2} of \textbf{0.443} and an \textbf{MSE} of \textbf{1.013}, surpassing the baseline. The correlation between real and predicted values is high-to-moderate (Pearson r = 0.667, Spearman $\rho$ = 0.670). As shown in Fig. \ref{fig:rf_regressor_predicted_vs_real.png}, the model struggles particularly with lower rating values, which correspond to the tails of the target variable's distribution, and does best for values around the mode of the distribution.
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/rf_regressor_predicted_vs_real.png}
+    \caption{Relationship between real and predicted values of \textit{averageRating} (RF Regressor).}
+    \label{fig:rf_regressor_predicted_vs_real.png}
+\end{figure}
 
 \subsection{XGBoost Regressor}
+The grid used for hyperparameter tuning is the following:
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,
+                   escapeinside={(*@}{@*)}]
+  { 'max_depth': [3, 6, 9],
+    'learning_rate': [0.05, 0.1, 0.3],
+    'min_child_weight': [1, 2, 3, 4],
+    'gamma': [0, 0.1, 0.5, 1],
+    'reg_alpha': [0, 0.01, 0.1],
+    'reg_lambda': [1, 1.5, 2, 5]  }
+\end{lstlisting}
+
+Once again, we compared the performance and overfitting gap for the same configurations using a different number of estimator (100, 300 or 500). In this case, more trees led to both better performances and a bigger overfitting gap.
+Interestingly, plotting the R2 overfitting gap as a function of the average validation R2 seems to suggest the existence of two slightly different exponential trends (Fig. \ref{fig:xgboost_regressor_overfitting.png}).
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/xgboost_regressor_overfitting.png}
+    \caption{Trade-off between avg validation R2 and overfitting gap for \textit{averageRating} (XGBoost Regressor).}
+    \label{fig:xgboost_regressor_overfitting.png}
+\end{figure}
+
+The best model's parameters are \texttt{'n\_estimators': 500, 'reg\_lambda': 5, 'reg\_alpha': 0.01, 'min\_child\_weight': 2, 'max\_depth': 9, 'learning\_rate': 0.1, 'gamma': 0}. It yielded 0.397 average validation R2 and 1.097 MSE (vs 0.759 and 0.439, respectively, on the training set).
+
+On the test set, its performance was worse than that of the Random Forest: it achieved \textbf{0.409 R2} and \textbf{1.075 MSE}. The predictions are only moderately correlated to the true values (Pearson r = 0.640, Spearman $\rho$ = 0.637; cf. Fig. \ref{fig:xgboost_regressor_predicted_vs_real.png}).
+
+We also tested a model whose validation metrics represented a compromise in the variance-bias trade-off (average train R2: 0.543, validation: 0.383). Its performances on the test set were slightly worse: 0.391 R2, 1.108 MSE. Its parameters were \texttt{'n\_estimators': 500, 'reg\_lambda': 5, 'reg\_alpha': 0.01, 'min\_child\_weight': 2, 'max\_depth': 9, 'learning\_rate': 0.1, 'gamma': 0.5}.
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{../results/images/xgboost_regressor_predicted_vs_real.png}
+    \caption{Relationship between real and predicted values of \textit{averageRating} (XGBoost Regressor).}
+    \label{fig:xgboost_regressor_predicted_vs_real.png}
+\end{figure}
