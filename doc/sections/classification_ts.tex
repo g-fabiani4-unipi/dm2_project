@@ -1,0 +1,81 @@
+\subsection{Classification and regression}
+For this section, we defined two classification tasks and one regression task to be approached with different representations of the time series.
+
+The first is a binary classification task that aims to detect action movies in our dataset; for the evaluation of this task we targeted the F1 score for the positive class, as we were interested in achieving a balance between precision and recall (see table \ref{tab:ts_action_cv_performance} for results in validation).
+
+The second classification task we undertook is a multi-class problem consisting in predicting the binned rating of a movie; since, as we already noticed in \ref{sec:ts_preparation}, rating classes are imbalanced, we evaluated model performance on the basis of the macro averaged F1 score, as to guarantee acceptable performances on all classes (see table \ref{tab:ts_rating_cv_performance}).
+
+In addition to these tasks, we also experimented with some models on the regression task of predicting the mean rating of a movie (see table \ref{tab:ts_regression_cv_performance}).
+
+In order to establish that our classifiers performance was better than random, we compared results with those obtained by a dummy classifier with stratified strategy; similarly, for regression, we checked that the MSE of the models didn't exceed the variance of the target feature (0.82).
+All models employed performed much better than their respective baselines.
+
+\begin{table*}
+    \centering
+    \csvautobooktabular{../results/tables/action_cv_performance.csv}
+    \caption{Performance of tested models for the action classification task in validation (mean and standard deviation).}
+    \label{tab:ts_action_cv_performance}
+\end{table*}
+
+\begin{table*}
+    \centering
+    \csvautobooktabular{../results/tables/rating_category_cv_performance.csv}
+    \caption{Performance of tested models for the rating classification task in validation (macro averages).}\label{tab:ts_rating_cv_performance}
+\end{table*}
+
+\begin{table}
+    \csvautobooktabular{../results/tables/rating_regression_cv.csv}
+    \caption{Performance of tested model for the regression task.}\label{tab:ts_regression_cv_performance}
+\end{table}
+
+\subsubsection{Distance-based approaches}\label{sec:tsclass_distance}
+We employed KNN classifiers (and regressor) on the signal of our time series. Since no approximation was needed, the only preprocessing step performed on the raw signals was amplitude scaling.
+
+For each task, we conducted grid search in order to find the optimal configuration of hyperparameters: we tested different values of \emph{k} between 1 and 60 and whether to weight exemplar by distance.
+But the hyperparameter we were most interested in was the distance function: we considered both Euclidean Distance and two versions of constrained DTW (Sakoe-Chiba Band of radius 0.05 and 0.1).
+We evaluated the performance of each configuration of hyperparameters performing a 5-fold stratified cross validation on the training set. In our pursuit for the best parameters, we considered area under the PR curve for the binary classification task, macro averaged F1 for the multi-class problem and the coefficient of determination for regression.
+Overall our models demonstrated great sensibility to the number of neighbors, either plateauing or decreasing performance between 10 and 20 neighbors and generally performed better when exemplars were weighted by distance.
+
+Impact of the presence of warping and warping constraints was generally negligible, with euclidean distance performing better on the binary classification task.
+Even when warping impacted positively the model performance (for the multi-class problem), the improvement was negligible when considering the score variance across folds.
+
+When evaluating our models on 5-fold stratified cross validation, we found that all of them were able to clear the respective baselines without problems.
+In particular, even without tuning the decision threshold our classifier obtained precision, recall and f1 all over 0.5 on the binary classification task.
+
+The regressor demonstrated no sensibility at all to distance or weights parameters, so we picked the simplest configuration possible.
+
+Proximity Forest is a distance based classifier that creates an ensemble of decision trees where splits are based on the similarity of the candidate time series with two exemplars measured using various distance measures.
+Since this model took much longer for fitting than the previous ones, we didn't tune parameters and performed holdout validation instead of 5-fold cross validation, reserving 25\% of the training test for validation.
+
+For both classification tasks, performance was comparable with that of KNN.
+
+\subsubsection{Global structural features approaches}
+Our second approach was to train a classifier on global structural features extracted from the original signals.
+We used the same set of features we already performed clustering on (see \ref{sec:tsclust_features}) and used Random Forest Classifier/Regressor as an estimator, a model we chose for its ability to provide somewhat interpretable results (by inspection of feature importance) while being less prone to overfitting than Decision Trees.
+
+When tuning hyperparameters, we let individual trees fully develop and manipulated only the number of estimators and the maximum number of features used by each tree: we experimented with 10, 50, 100 and 200 estimators and with the following values of features: \texttt{log2}, \texttt{sqrt}, all features.
+Grid search was performed with the same modalities and target scores detailed in \ref{sec:tsclass_distance}.
+
+While 10 estimators proved too few, overall the models didn't show an extreme sensitivity to hyperparameters: standard deviation across folds was generally greater than differences between parameters configurations.
+50 estimators and all features were found to be the best configuration for both multi-class classification and regression, while for binary classification we used 200 estimators and \texttt{max\_features='log2'}.
+
+On cross-validation these models out-performed KNN on all tasks, albeit non decisively, except on the regression task.
+While F1 score on the binary classification task was lower than that of KNN, area under the PR curve was greater, indicating that KNN could be out-performed with decision threshold tuning.
+
+\subsubsection{Ensemble of interval-based approaches}
+These approaches operate on representations of the original time series that are created by extracting summary statistics from selected subsequences.
+We experimented with Time Series Forest, a very simple model that summarizes intervals only by mean, standard deviation and slope, and with Diverse Representation CIF (DrCIF), which represents an extension of Canonical Interval Forest and is generally considered the state of the art for this family of approaches.
+
+For both TSF and drCIF, we experimented with different combinations of minimum and maximum interval length. For the minimum interval length we capitalized on insight gained from motifs discovery, so we tested with lengths of 6, 7, 8, 14, 28 and 35 timestamps.
+Generally speaking, a smaller interval length (7) was preferred for all tasks.
+As for the maximum interval length, we allowed for either half the size of the time series, or the whole time-series.
+We noticed that the influence of this second parameter became non-existent the more estimators we considered: for TSF we experimented with 5, 10, 50, 100 and 200 estimators, while for drCIF, which is much more computationally expensive, we limited the search to 5 and 10 estimators.
+While the impact of number of estimators is not clear on the binary classification task, we noticed improvements on both the multi-class problem and the regression when using more estimators.
+
+On 5-fold cross validation, TSF and drCIF demonstrated performances comparable to those of the previous approach. The biggest gap is on the regression task, but considering the variance across scores from different folds, this difference is probably not significant.
+It is possible that drCIF performance, which is practically indistinguishable from that of TSF, was hindered by our choice to limit the number of estimators considered.
+
+\subsubsection{Shapelets}
+
+
+\subsubsection{Assessment}
