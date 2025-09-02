@@ -43,7 +43,7 @@ The best results are obtained with Edited Nearest Neighbor. The PR curve for ENN
 
 It seems to us that Random Under-sampling may be the preferred choice in some context in which fitting time would be a more pressing concern than the precision of the prediction, so we decided to assess both Edited NN and Random Under-sampling on the test set.
 
-\subsubsection{Decision threshold and assessment}
+\subsubsection{Tuning of decision threshold and assessment}
 Edited Nearest Neighbor showed satisfactory performance, improving by 0.1 the F1 score of the vanilla KNN and having the best precision among all tested methods (0.50) and recall at least better than the vanilla KNN.
 Nevertheless, we decided to post-tune the decision threshold of both our best performing models before assessment on the test set.
 For the pipeline using Random Under-sampling this resulted in setting a higher threshold (0.77), while for Edited NN the threshold had to be lowered to 0.38.

@@ -1,1 +1,68 @@
 \subsection{Anomaly detection}\label{sec:anomaly_detection}
+In this section, we adopted methods from different families in order to detect the top 1\% anomalous instances in our dataset.
+When we do not specify otherwise, we fitted all methods on all numeric features of our dataset after scaling them with a Robust Scaler.
+
+In all cases, we then analyzed how candidate outliers were distributed w.r.t. known features and visualized them on the first two components projected by PCA (Fig. \ref{fig:outliers}).
+These two components alone explain more than 50\% of the variance of the dataset.
+Inspecting the PCA Eigenvectors, we found out that \emph{TotalImages}, \emph{numRegions}, \emph{numVotes}, \emph{companiesNumber}, \emph{externalLinks} and \emph{totalCredits} contributed in a major way to the first component, while \emph{averageRating} and \emph{startYear} contributed negatively to the second component.
+Fig. \ref{fig:outliers_density} provides much needed perspective on the density of records across the two principal components.
+
+\begin{figure*}[t]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{../results/images/outliers_density.png}
+        \caption{Density of records.}\label{fig:outliers_density}
+    \end{subfigure}
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{../results/images/outliers_hbos.png}
+        \caption{HBOS.}
+    \end{subfigure}
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{../results/images/outliers_ell_env.png}
+        \caption{Elliptic Envelope.}
+    \end{subfigure}
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{../results/images/outliers_isolation_forest.png}
+        \caption{Isolation Forest.}\label{fig:isolation_forest}
+    \end{subfigure}
+    \caption{Results of different methods of anomaly detection.}\label{fig:outliers}
+\end{figure*}
+
+\subsubsection{HBOS}
+When analyzing records deemed anomalous by HBOS, we noticed that almost all of them (90\%) were movies and very popular movies, at that.
+In addition to that 44\% of candidate outliers received awards, a proportion that increased to 62\% when considering also nominations and 70\% of them had at least one video on their IMDB page, while all of them were reviews by both critics and users.
+Interestingly, all of these proportions are much higher not only when compared with the general distribution in the dataset (cf table \ref{tab:binarized_features}), but also w.r.t. observed frequencies in movies.
+It should also be noted that TV episodes make up almost half of the dataset, no TV episode was deemed anomalous by HBOS.
+
+Visualizing HBOS results in latent space we noticed that outliers and inliers have almost non overlapping distributions with respect to the first component.
+This is hardly surprising, considering which original features contribute to this component, and merely confirms what we already observed when checking the distribution of inliers and outliers with respect to the original features.
+
+Checking the distribution of candidates against the clustering created in \ref{sec:tabular_clustering} we found out that they came almost exclusively from C1 and C2.
+
+HBOS is a very naive approach to anomaly detection on multivariate data that is unable to take into consideration interaction between features.
+In addition to that HBOS comes with a strong assumption of independence between features; even though we removed the most highly correlated features from our dataset, we still have a number of features with moderate to high positive correlation which are bound to skew the results of this method.
+
+\subsubsection{Elliptic Envelope}
+We adopted Elliptic Envelope as the only depth-based approach that has a python implementation.
+In contrast to a classic depth-based approach, this method comes with the assumption that the dataset has a Gaussian distribution; since this is not the case for our data, in this case we performed normalization with a Power Transformer in order to reduce skewness and stabilize variance.
+
+Candidate outliers extracted with this method show a wholly different distribution w.r.t title type: 261 are TV episodes, 423 tv series and 285 are shorts.
+The latter we found particularly interesting, since shorts make up only around 10\% of records in our dataset, but 35\% of candidate outliers.
+
+We were also able to see that outliers are distinct from inliers by runtime (they are much shorter) and year (they are older).
+The distribution w.r.t. number of credits is also interesting: outliers show a bimodal distribution overlapping with the tails of the inliers distribution, meaning that outliers have exceptionally small or exceptionally big productions.
+
+\subsubsection{Isolation Forest}
+Isolation Forest obtained results that are very similar to those we already observed for HBOS.
+As a matter of fact, while HBOS and Elliptic Envelope candidate outliers showed minimal overlap, 40\% of Isolation Forest candidate outliers were already flagged by HBOS.
+
+Candidate outliers display extreme values on all features that associated with big and popular productions.
+This is also evident by visualizing results on latent features: fig. \ref{fig:isolation_forest} shows that there is almost no overlap between outliers and inliers w.r.t. the first component.
+96\% of candidate outliers come from either C1 or C2, with 80\% from C1 alone and more than half of the records from C1 are considered outliers.
+When confronting fig. \ref{fig:isolation_forest} with fig. \ref{fig:density_pca}, we can see that while candidate outliers cluster together and thus, logically speaking, they can't be considered isolated, records are extremely sparse on high values of the first component, thus explaining Isolation Forest results.
+
+\subsubsection{Conclusions}
+All methods were united in deeming records representing big and popular productions as anomalous.
+We found no indication that the anomalous values encountered were in any way erroneous or the result of a data quality problem, so it doesn't make sense to treat them as missing values.
+While it makes sense that among all forms of visual entertainment recorded in our dataset blockbusters would be exceedingly rare, we do not find it appropriate to remove them from the data.
+We maintain that any analysis of this dataset which excluded such titles would fail to capture a very important aspect of the phenomena it claimed to model and would be, as a consequence meaningless.

@@ -212,7 +212,7 @@ Since the distribution of \textit{runtimeMinutes} depends on \textit{titleType},
 On the other hand, we chose not to replace missing values for \textit{genres}, \textit{region} or \textit{countryOfOrigin}. They can easily be handled when performing the encoding for our methods without introducing bias, therefore we'd rather preserve the original distributions and correlations.
 
 
-\subsection{Clustering}
+\subsection{Clustering}\label{sec:tabular_clustering}
 \begin{figure*}
     \center
     \includegraphics[width=.8\textwidth]{../results/images//understanding_clustering.png}
@@ -228,7 +228,7 @@ We then performed hierarchical clustering on the centroids of K-Means clusters, 
 
 We found 13 clusters of varying sizes, with the top cluster grouping one fifth of the entire dataset and the top four clusters grouping half of the dataset. Five clusters contained less than 5,000 records each.
 
-For reasons that wil become apparent in \ref{sec:anomaly_detection}, we concentrated our analysis on two smaller clusters: C1 (1,668 records) and C2 (3,923). These clusters belong to the same supercluster, that is merged latest of all with the rest of the dataset.
+For reasons that will become apparent in \ref{sec:anomaly_detection}, we concentrated our analysis on two smaller clusters: C1 (1,668 records) and C2 (3,923). These clusters belong to the same supercluster, that is merged latest of all with the rest of the dataset.
 
 Both clusters are made up primarily from movies (with some tv series), and according to their distribution w.r.t. \emph{numVotes}, probably contain blockbuster movies and very popular TV series \ref{fig:tabular_clustering}.
 In addition to that, almost 57\% of records from C1 received awards, a proportion that increases to 80\% when considering also nominations.
