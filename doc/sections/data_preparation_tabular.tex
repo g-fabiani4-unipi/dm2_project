@@ -38,11 +38,11 @@ We then split the dataset, reserving 70\% for training, and the remaining 30\% f
 \subsection{First Global Exploration of the Training Set}
 A first global analysis of the dataframe's summary and descriptive statistics revealed missing values for \textit{endYear} (100,729), \textit{runtimeMinutes} (28,185), \textit{countryOfOrigin} (27,961) and \textit{genres} (1,887). Since most records are missing an \textit{endYear}, and the feature is strongly correlated to \textit{startYear}, we dropped it.
 
-Since a great majority of records had no information about sound mixes, we decided to drop this feature as well.
+Given that the great majority of records had no information about sound mixes, we decided to drop this feature as well.
 
 \textit{bestRating}, \textit{worstRating}, and \textit{isRatable} were once again confirmed to be uninformative, as they only take one value for all records (10, 1, and 1, respectively), and were therefore dropped. We also dropped \textit{ratingCount}, as it was strongly correlated to \textit{numVotes}, and \textit{isAdult}, because it's redundant w.r.t. the \textit{adult} category in \textit{genres}.
 
-Checking the values for the only remaining original binary attribute, \textit{canHaveEpisodes}, we noticed that only two records with a \textit{titleType} different from \textit{tvSeries} and \textit{tvMiniSeries} have a positive value. We corrected them: the first had been registered as a \textit{tvMovie} instead of \textit{tvSeries}, while the second was a short with no episodes.
+Checking the values for the only remaining original binary attribute, \textit{canHaveEpisodes}, we noticed that only two records with a \textit{titleType} different from \textit{tvSeries} and \textit{tvMiniSeries} have a positive value. We corrected them: the first had been registered as a \textit{tvMovie} instead of \textit{tvSeries}, while the second was actually a short with no episodes.
 
 Lastly, we removed the string \texttt{'\textbackslash \textbackslash N'}, which was prepended to all lists of \textit{regions}, making the feature consistent with \textit{numRegions}.
 
@@ -65,8 +65,8 @@ Lastly, we removed the string \texttt{'\textbackslash \textbackslash N'}, which 
 
 In this subsection, we studied the univariate and bivariate distribution of categorical variables, which all turned out to be unbalanced.
 
-Differently from the DM1 dataset, the most popular \textit{\textbf{titleType}} is \textit{tvEpisode} (47\% of the records), followed by \textit{movie} (25\%) and \textit{short} (11\%); \textit{tvSpecial} (0.79\%) and \textit{tvShort} (0.17\%) are the classes with the lowest support (cf Fig \ref{fig:titleType_distribution}). With regard to \textit{\textbf{genres}}, the two most popular classes are by far \textit{Drama} and \textit{Comedy}, although it depends on \textit{titleType}.
-Binned \textit{\textbf{rating}} follows a left-skewed distribution, with the mode being the [7,8) class (Fig. \ref{fig:rating_histogram.png}).
+Differently from the DM1 dataset, the most popular \textit{\textbf{titleType}} is \textit{tvEpisode} (47\% of the records), followed by \textit{movie} (25\%) and \textit{short} (11\%); \textit{tvSpecial} (0.79\%) and \textit{tvShort} (0.17\%) are the classes with the lowest support (cf. Fig \ref{fig:titleType_distribution}). With regard to \textit{\textbf{genres}}, the two most popular classes are by far \textit{Drama} and \textit{Comedy}, although the distribution depends on \textit{titleType}.
+\textit{\textbf{rating}} follows a left-skewed distribution, with the mode being the \textit{[7,8) }class (Fig. \ref{fig:rating_histogram.png}).
 The most popular \textit{\textbf{countryOfOrigin}} and \textit{\textbf{region}} is the US, but both features have a substantial amount of missing values: \textit{nan} is the second most popular value for both.
 
 We dropped \textit{soundMixes}: not only are most of its 59 unique values very rare, it has too many missing values to provide useful information.
@@ -76,7 +76,7 @@ We dropped \textit{soundMixes}: not only are most of its 59 unique values very r
 \label{numeric_vars_analysis}
 Before analyzing numeric variables, we added the same features we had added to the DM1 dataset:
 \begin{itemize}
-    \item \textit{numCountriesOfOrigin}: the number of countries listed for the record for the variable \textit{countryOfOrigin}. For the training set, the values range from 1 to 10.
+    \item \textit{numCountriesOfOrigin}: the number of countries listed for the record for the variable \textit{countryOfOrigin}.
     \item \textit{numGenres}: the number of genres listed in \textit{genres}. For the training set, the values range from 1 to 3.
     \item \textit{reviewsTotal}: the sum of \textit{criticReviewsTotal} and \textit{userReviewsTotal}.
     \item \textit{criticReviewsRatio}: the proportion of review from critics (\textit{criticsReviewTotal}) on the total number of reviews of a record (\textit{reviewsTotal}). For unreviewed records, it is set to zero.
@@ -85,7 +85,7 @@ Before analyzing numeric variables, we added the same features we had added to t
 
 A pairplot of all numeric variables, with KDE graphs on the diagonal, allowed us to gain a global view of both the features' univariate distribution and their pairwise correlations. Given the size of the dataset, we resorted to using a random sample of 20,000 records.
 The great majority of the variables has a right-skewed distribution (\textit{writerCredits, numRegions, awardWins, totalImages, criticReviewsTotal, runtimeMinutes, userReviewsTotal, totalCredits, totalVideos, castNumber, numVotes, quotesTotal, awardNominationsExcludeWins, companiesNumber, externalLinks, awardsAndNominations, numCountriesOfOrigin, reviewsTotal}).
-\textit{averageRating}, of course, follows the same left-skewed distribution observed for its discretized version, \textit{rating} (cf. Fig. \ref{fig:rating_histogram.png}).
+\textit{averageRating}, of course, follows the same left-skewed distribution observed for its binned version, \textit{rating} (cf. Fig. \ref{fig:rating_histogram.png}).
 
 We observed that some records have an implausibly long runtime, probably due to the inconsistent strategy adopted for the computation of the runtime for serialized content, for which sometimes the total runtime of a series is registered, rather than the average episode runtime.
 In order to avoid this problem, we removed the runtime of all \textit{tvSeries}, \textit{tvMiniSeries}, and \textit{tvEpisodes} for which the value exceeded the 3rd quartile + 1.5 interquartile range for its specific category (105, 382.5 and 84 minutes, respectively); a total of 1560 records in the training set were affected.
@@ -206,7 +206,7 @@ The total number of final features is 27; they are listed in Tables \ref{tab:dat
 
 \subsection{Handling Missing Values}
 \label{handling_nan}
-At this point, we still have missing values for \textit{countryOfOrigin}, \textit{region}, \textit{genres}, \textit{runtimeMinutes} and \textit{writerCredits}; some were preexisting, others were removed as detailed Subsec. \ref{numeric_vars_analysis}.
+At this point, we still have missing values for \textit{countryOfOrigin}, \textit{region}, \textit{genres}, \textit{runtimeMinutes} and \textit{writerCredits}; some were preexisting, others were removed as detailed in Subsec. \ref{numeric_vars_analysis}.
 Since the distribution of \textit{runtimeMinutes} depends on \textit{titleType}, and the same holds true for \textit{writerCredits}, we imputed their missing values using the median value within each respective class.
 
 On the other hand, we chose not to replace missing values for \textit{genres}, \textit{region} or \textit{countryOfOrigin}. They can easily be handled when performing the encoding for our methods without introducing bias, therefore we'd rather preserve the original distributions and correlations.
