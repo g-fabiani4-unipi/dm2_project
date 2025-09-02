@@ -118,17 +118,6 @@ Fig \ref{fig:mp_shapelet} shows one of the top shapelets: we can notice two majo
 
 
 \subsubsection{Assessment}
-For our assessment, we evaluated the performance of the Catch22 RF and of TSF on the test set.
-For the binary classification task, shapelet based models were also included.
-
-For the binary classification task, we tuned the decision threshold of each model with 5-fold cross validation on the training set before evaluating it on the test set.
-
-Catch22 RF and RSF performed very similarly on the test set, obtaining the same F1 score for the positive class (0.61) albeit with a different trade off between precision and recall (RSF had higher precision).
-From the PR curves in fig \ref{fig:ts_clf_test_pr} we can observe that, while all considered classifiers have a similar performance, Catch22 RF demonstrated better ranking capabilities, both in terms of average precision and of stability of the PR curve.
-
-We also tested the model that is using manually extracted shapelets, not because it showed impressive performance in validation (it did not), but because we wanted to confirm our hypothesis that this model overfitted the validation set, since we performed shapelet extraction on the entire training set.
-Surely enough, average precision showed degradation on the test set (decreasing to 0.52), and in particular produced more top ranked false positives than during cross validation.
-
 \begin{figure}
     \includegraphics[width=\columnwidth]{../results/images/ts_clf_test_pr.png}
     \caption{Precision-Recall curves for the action classification task on test set.}\label{fig:ts_clf_test_pr}
@@ -145,6 +134,18 @@ Surely enough, average precision showed degradation on the test set (decreasing 
     \includegraphics[width=\columnwidth]{../results/images/ts_clf_test_scatter.png}
     \caption{Relationship between real ratings and rating predicted by the C22 regressor during testing.}\label{fig:ts_clf_test_scatter}
 \end{figure}
+
+For our assessment, we evaluated the performance of the Catch22 RF and of TSF on the test set.
+For the binary classification task, shapelet based models were also included.
+
+For the binary classification task, we tuned the decision threshold of each model with 5-fold cross validation on the training set before evaluating it on the test set.
+
+Catch22 RF and RSF performed very similarly on the test set, obtaining the same F1 score for the positive class (0.61) albeit with a different trade off between precision and recall (RSF had higher precision).
+From the PR curves in fig \ref{fig:ts_clf_test_pr} we can observe that, while all considered classifiers have a similar performance, Catch22 RF demonstrated better ranking capabilities, both in terms of average precision and of stability of the PR curve.
+
+We also tested the model that is using manually extracted shapelets, not because it showed impressive performance in validation (it did not), but because we wanted to confirm our hypothesis that this model overfitted the validation set, since we performed shapelet extraction on the entire training set.
+Surely enough, average precision showed degradation on the test set (decreasing to 0.52), and in particular produced more top ranked false positives than during cross validation.
+
 
 For the multi-class problem, the best performance came from Catch22 RF, which obtained a macro F1 of 0.34 (0.7 higher than the contender), and showed consistently better performance than TSF on all classes.
 Inspecting the confusion matrix in fig. \ref{fig:ts_clf_test_conf_mat}, we can see that our model performs the best on classes with the highest support (High and Medium), while both Medium High and Medium Low are frequently misclassified with as Medium. Low has 0 recall.
