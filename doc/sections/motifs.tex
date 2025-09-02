@@ -1,5 +1,5 @@
 \subsection{Motifs, discords  and shapelets}\label{sec:motifs}
-In this section we performed several analysis related to motifs and discords in our time series leveraging the Matrix Profile.
+In this section, we performed several analysis related to motifs and discords in our time series leveraging the \textbf{Matrix Profile}.
 
 \subsubsection{Motifs and conserved patterns}
 \begin{figure*}[t]
@@ -20,48 +20,48 @@ In this section we performed several analysis related to motifs and discords in 
     \caption{Best matching pattern between cluster medoids.}\label{fig:conserved_pattern}
 \end{figure}
 
-Our first analysis was extracting and visualizing motifs on the cluster medoids found in \ref{sec:ts_clustering}.
+In our first analysis, we extracted and visualized motifs on the \textbf{cluster medoids} found in Subsec. \ref{sec:ts_clustering}.
 Knowing that our time series display day of week seasonality (and therefore they have a period of around 14 timestamps), we inspected results for different window sizes, before settling on 6.
 
-Fig \ref{fig:medoid_motifs} shows in green the motifs found on two cluster medoids that are good representative, respectively of instant hits and `late bloomers'.
+Fig \ref{fig:medoid_motifs} shows in green the motifs found on two cluster medoids that are good representatives, respectively, of instant hits and 'late bloomers'.
 
-Additionally, we looked for a conserved pattern between these two medoids. Interestingly, the best matching pattern visualized in \ref{fig:conserved_pattern} is also a motif in \emph{Mad Max: Fury Road} (see again fig \ref{fig:motifs_mad_max}).
-This may suggest that the seasonal peaks in movies from the two clusters are not so different after all and probably reflect a general pattern of movie-goers behavior.
+Additionally, we looked for a conserved pattern between these two medoids. Interestingly, the best matching pattern visualized in Fig. \ref{fig:conserved_pattern} is also a motif in \emph{Mad Max: Fury Road} (see again Fig. \ref{fig:motifs_mad_max}).
+This may suggest that the seasonal peaks in movies from the two clusters are not so different after all, and probably reflect a general pattern of movie-goers behavior.
 
 
 \subsubsection{Discords}
-In order to detect discords, we searched for points on the matrix profile that were deemed anomalous by a one-sided Grubbs test (one such subsequence is reported in red in fig. \ref{fig:motifs_mad_max}).
+In order to detect discords, we searched for points on the matrix profile that were deemed anomalous by a one-sided Grubbs test (one such subsequence is reported in red in Fig. \ref{fig:motifs_mad_max}).
 With our more stringent definition of discord, we were able to detect 89 records in our dataset that contained anomalous patterns.
 
-Interestingly, the two records that we identified as outliers w.r.t. year of release, were indeed in this group.
+Interestingly, the two records that we had identified as outliers w.r.t. year of release, were indeed in this group.
 When we visualized them, we noticed that they bear scarce resemblance to the time series analyzed so far.
 This may warn us that our analysis isn't really generalizable to longer box office trends out of the specific historical period represented in our dataset, as it is predicated on societal trends that may have less staying power than we may think.
 
 \subsubsection{Consensus Motif}
-We also leveraged the matrix profile in order to find a consensus motif, i.e. the subsequence from the entire dataset that induces the smallest radius. We ran the \emph{Ostinato} algorithm on our data with a window size of 28 timestamps (i.e. a two weeks period) which we judged to be good size for finding a discriminative subsequence.
+We also leveraged the matrix profile in order to find a consensus motif, i.e. the subsequence from the entire dataset that induces the smallest radius. We ran the \emph{Ostinato} algorithm on our data with a window size of 28 timestamps (i.e. a two weeks period), which we judged to be good size for finding a discriminative subsequence.
 
-From each time series we extracted the best match for the consensus motif (see fig. \ref{fig:consensus_motif}). The visualization of the matching subsequences showed a pattern that is well known to us and this point: two major peaks in the weekend (the second smaller than the first) and smaller peaks in the middle of the week after each major peak. For most time series we observed only small deviations from this motif: for example a subtle anticipation of the second major peak or a relatively higher midweek peak.
+From each time series we extracted the best match for the consensus motif (see Fig. \ref{fig:consensus_motif}). The visualization of the matching subsequences showed a pattern that is well known to us and this point: two major peaks in the weekend (the second smaller than the first) and smaller peaks in the middle of the week after each major peak. For most time series we observed only small deviations from this motif: for example, a subtle anticipation of the second major peak or a relatively higher midweek peak.
 
 \begin{figure}
     \includegraphics[width=\columnwidth]{../results/images/consensus_motif.png}
     \caption{Best match for the consensus motif on all time series.}\label{fig:consensus_motif}
 \end{figure}
 
-We decided to perform clustering on this novel representation of our time series.
+We decided to perform \textbf{clustering} on this novel representation of our time series.
 Hierarchical clustering failed to yield any results comparable with those obtained by shape based or feature based clustering.
 
-Also running OPTICS and inspecting the reachability plot didn't allow us to discover any clusters. However, running DBSCAN on the reachability distances computed by OPTICS with an appropriate value for $\epsilon$ (chosen in correspondence of an elbow in the reachability plot) returned one single cluster and 82 noise points. Inspecting the distribution of noise points w.r.t. known features revealed that movies that we had deemed anomalous either by release year or by runtime during the understanding phase were classified as noise by the density based clustering.
+Also running OPTICS and inspecting the reachability plot didn't allow us to discover any clusters. However, running \textbf{DBSCAN} on the reachability distances computed by OPTICS with an appropriate value for $\epsilon$ (chosen in correspondence of an elbow in the reachability plot) returned one single cluster and 82 noise points. Inspecting the distribution of noise points w.r.t. known features revealed that movies that we had deemed anomalous either by release year or by runtime during the understanding phase were classified as noise by the density based clustering.
 
 While some series conserve the consensus motif with less fidelity (or arguably they do not conserve it at all), it wasn't possible to detect an interesting pattern in the variation of the motif.
 This probably makes sense, considering the nature of our data: while the shape of the entire time series has enabled us to find groups of movies with distinct patterns (especially with respect to the position of the highest peak and the general trend of the time series), this conserved motif is probably registering a common pattern in the behavior of movie goers, which is largely independent of the characteristics of the specific movie.
 
 \subsubsection{Shapelet discovery}\label{sec:shapelet_discovery}
 
-In this section we leveraged the matrix profile in order to extract shapelets that would be of use in predicting if a movie is an action movie or not.
+In this section, we leveraged the matrix profile in order to extract shapelets that would be of use in predicting if a movie is an \textbf{action movie} or not.
 
 To do this, we split our training data in action and non action movies and, after amplitude scaling, concatenated all the individual samples of each class in one long time series. In order to avoid finding spurious patterns across time series, we established a clear boundary, appending \texttt{Nan} at the end of each time series.
 
 The basic idea is that the matrix profile $P_{Action,Action}$ computed on the time series $T_{Action}$ allows us to identify conserved subsequences within $T_{Action}$. A matrix profile $P_{Action,NoAction}$, computed across two different time series $T_{Action}$ and $T_{NonAction}$ compares all the subsequences of $T_{Action}$ with all the subsequences in $T_{NoAction}$ in order to determine if there are any subsequences in $T_{Action}$ that can also be found in $T_{NoAction}$.
-If a discriminative pattern (shapelet) is present in the \emph{Action} class but not in the \emph{NoAction} class, then we would expect to see significant differences in heights among the matrix profiles $P_{Action,Action}$ and $P_{Action,NonAction}$. So, if we compute $P_{diff} = P_{Action,NoAction} - P_{Action,Action}$ we expect peak values to indicate good shapelets candidates, because they suggest patterns that are well conserved in their own class but very different from their closest match in the other class.
+If a discriminative pattern (shapelet) is present in the \emph{Action} class but not in the \emph{NoAction} class, then we would expect to see significant differences in heights among the matrix profiles $P_{Action,Action}$ and $P_{Action,NonAction}$. So, if we compute $P_{diff} = P_{Action,NoAction} - P_{Action,Action}$, we expect peak values to indicate good shapelets candidates, because they suggest patterns that are well conserved in their own class but very different from their closest match in the other class.
 
 After computing the matrix profiles with a window of 28 timestamps (so on a period of two weeks), for each class we extracted the top 10 candidate shapelets, which we then used in the classification task as detailed in \ref{sec:tsclass_shapelets}.
