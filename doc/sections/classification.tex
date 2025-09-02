@@ -17,7 +17,7 @@ On the test set, the final model achieved a \textbf{macro F1} of\textbf{ 0.145} 
 
 The model has managed to generalize some information only for the classes with the highest support: the performances peak for the mode, \textit{(7,8]} (F1: 0.544), its neighboring classes are confused for it most of the time, and as we move to the tail of the bell distribution, it achieves consistently poor results (F1 < 0.05).
 
-Looking at the model's coefficients, the overall most important feature is \textit{hasCriticReviews} (mean absolute value > 1.2, while for the other coefficients in the top 15 it is in the interval \textit{[0.6, 0.7]}): it is the first or second-biggest coefficient for the best performing classes (i.e. for the interval \textit{(5,8]}), and for all of them it takes on a negative value, suggesting that having critical reviews lowers the probability of a record of having an 'average-to-high' rating.
+Looking at the model's coefficients, the overall most important feature is \textit{hasCriticReviews} (mean absolute value > 1.2, while for the other coefficients in the top 15 it is in the range [0.6, 0.7]): it is the first or second-biggest coefficient for the best performing classes (i.e. for the interval \textit{(5,8]}), and for all of them it takes on a negative value, suggesting that having critical reviews lowers the probability of a record of having an 'average-to-high' rating.
 
 \subsubsection{Title Type}
 For this task, the final model resulting from the grid search achieved an average validation macro F1 of 0.653 (on the training set: 0.664). The final parameters chosen were: \texttt{{'C': 100, 'penalty': 'l2', 'solver': 'newton-cg'}}.
@@ -119,13 +119,14 @@ Indeed, there are many possible hyperparameters to tune. For each task, we ran t
 \subsubsection{Rating}
 Before proceeding with hyperparameter tuning, we first tested a Random Forest using default parameters, which yielded an average validation macro F1 of 0.296, and an even better 0.302 macro F1 score on the test set.
 
-As shown in Fig. \ref{fig:rf_comparison_n_estimators_rating.png}, analyzing the results from the Randomized Searches revealed that the number of estimators is not a strong driver of performance. Although the performance of the other two models was very close, we chose the best model with 300 base classifiers, which yielded an average macro F1 equal to 0.308 for validation, and equal to 0.968 for train. Its parameters are: \texttt{{'n\_estimators': 300, 'min\_samples\_split': 5, 'min\_samples\_leaf': 1, 'max\_depth': None, 'criterion': 'gini', 'class\_weight': 'balanced'}}.
+%As shown in Fig. \ref{fig:rf_comparison_n_estimators_rating.png},
+The analysis of the results from the Randomized Searches revealed that the number of estimators is not a strong driver of performance: the average validation macro F1 doesn't change significantly among hyperparameter configurations differing only in the number of trees. Although the performance of the other two models was very close, we chose the best model with 300 base classifiers, which yielded an average macro F1 equal to 0.308 for validation, and equal to 0.968 for train. Its parameters are: \texttt{{'n\_estimators': 300, 'min\_samples\_split': 5, 'min\_samples\_leaf': 1, 'max\_depth': None, 'criterion': 'gini', 'class\_weight': 'balanced'}}.
 
-\begin{figure}
-    \includegraphics[width=\columnwidth]{../results/images/rf_comparison_n_estimators_rating.png}
-    \caption{Avg cross-validation macro F1 for different parameter configurations across varying numbers of estimators for \textit{rating} (RF).}
-    \label{fig:rf_comparison_n_estimators_rating.png}
-\end{figure}
+%\begin{figure}
+%    \includegraphics[width=\columnwidth]{../results/images/rf_comparison_n_estimators_rating.png}
+%    \caption{Avg cross-validation macro F1 for different parameter configurations across varying numbers of estimators for \textit{rating} (RF).}
+%    \label{fig:rf_comparison_n_estimators_rating.png}
+%\end{figure}
 
 
 Whether such a gap between validation and train macro F1 should be interpreted as a sign of overfitting for Random Forest is debated in the literature: it has been argued that, even if the single trees can overfit, they tend to do so in different ways, so that combining them in an ensemble reduces the overall variance. Thus, although pruning the individual trees can be beneficial, unless the dataset is very simple, we could consider Random Forest as particularly robust against overfitting.
@@ -185,19 +186,19 @@ Similarly to what we did for Random Forests, we performed hyperparameter using a
 \subsubsection{Rating}
 The best resulting model has the following hyperparameters: \texttt{'n\_estimators': 300, 'reg\_lambda': 0.1, 'reg\_alpha': 0.01, 'num\_leaves': 50, 'max\_depth': 10, 'learning\_rate': 0.1, 'boosting\_type': 'gbdt'}. It yielded an average cross-validation macro F1 of 0.285 and of 0.819 on the training set, showing signs of overfitting.
 
-Given the same hyperparameter configuration, increasing the number of estimators leads to a better performance (Fig. \ref{fig:lightgbm_estimators.png}), but also to a larger overfitting gap (i.e. the difference between training and validation macro F1) (Fig. \ref{fig:lightgbm_overfitting.png}).
+Given the same hyperparameter configuration, increasing the number of estimators leads to a better performance, but also to a larger overfitting gap (i.e. the difference between training and validation macro F1).
 
-\begin{figure}
-    \includegraphics[width=\columnwidth]{../results/images/lightgbm_estimators.png}
-    \caption{Avg. cross-validation macro F1 for different parameter configurations for 100 and 300 DTs for \textit{rating} (LightGBM).}
-    \label{fig:lightgbm_estimators.png}
-\end{figure}
+%\begin{figure}
+%    \includegraphics[width=\columnwidth]{../results/images/lightgbm_estimators.png}
+%    \caption{Avg. cross-validation macro F1 for different parameter configurations for 100 and 300 DTs for \textit{rating} (LightGBM).}
+%    \label{fig:lightgbm_estimators.png}
+%\end{figure}
 
-\begin{figure}
-    \includegraphics[width=\columnwidth]{../results/images/lightgbm_overfitting.png}
-    \caption{Overfitting gap for different parameter configurations for 100 and 300 DTs for \textit{rating} (LightGBM).}
-    \label{fig:lightgbm_overfitting.png}
-\end{figure}
+%\begin{figure}
+%    \includegraphics[width=\columnwidth]{../results/images/lightgbm_overfitting.png}
+%    \caption{Overfitting gap for different parameter configurations for 100 and 300 DTs for \textit{rating} (LightGBM).}
+%    \label{fig:lightgbm_overfitting.png}
+%\end{figure}
 
 Fig. \ref{fig:lightgbm_overfitting_vs_performance_rating.png} shows how the overfitting gap grows exponentially as performances increase, suggesting that the data is hard to model.
 \begin{figure}
@@ -339,6 +340,6 @@ As anticipated, the task of predicting \textit{titleType} yielded better results
 
 All models achieved great results for the more popular classes, with an F1 around 0.9, while the results for the minority classes varied from around 0.4 to a robust 0.7 for the best models. In particular, the best models achieved great results for \textit{videogame}, and were better at separating \textit{tvMovie} and \textit{tvMiniSeries} from their more popular counterparts, \textit{movie} and \textit{tvSeries}.
 
-With regard to \textit{rating}, the performance of every model reflects the class distribution, which resembles a left-skewed Gaussian: performances peak for class \textit{(7,8]}, the mode, and quickly degrade. The models do not have a chance to generalize on the lowest and the highest classes, especially those in the 'tail', due to lack of representation. The best models, however, managed to concentrate their confusion on neighboring classes, especially around the peak of the distribution. Future work could explore undersampling and oversampling techniques, which might help improve generalization.
+With regard to \textit{rating}, the performance of every model reflects the left-skewed class distribution: performances peak for class \textit{(7,8]}, the mode, and quickly degrade. The models do not have a chance to generalize on the lowest and the highest classes, especially those in the 'tail', due to lack of representation. The best models, however, managed to concentrate their confusion on neighboring classes, especially around the peak of the distribution. Future work could explore undersampling and oversampling techniques, which might help improve generalization.
 
 Finally, some challenges related to overfitting were observed, despite using hyperparameter grids designed to explore different trade-offs between bias and variance; investigating stronger regularization strategies or data balancing techniques may help improve robustness.

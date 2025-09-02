@@ -6,13 +6,13 @@ We therefore decided to only compute the SHAP values for 'prototypical' instance
 
 Twelve out of the 13 instances either belonged to or were classified as one of the top three \textit{titleTypes}: \textit{movie}, \textit{tvEpisode} and \textit{short}. Three instances were misclassified. Overall, we find that \textit{runtimeMinutes} is the most important feature for almost all records, confirming what anticipated by the Random Forest MDI importance (cf. Fig. \ref{fig:rf_feat_impo_tt.png}).
 
-All four \textit{\textbf{tvEpisodes}} were correctly classified. For all of them, the most important feature was \textit{runtimeMinutes}, except for the only one that was classified with 100\% confidence, Medoid n. 5: the biggest contribution, with +0.29, has been made by \textit{numRegions} (cf. Fig \ref{fig:shap_medoid_5.png}). Looking at the record's values, \textit{numRegions} is set to zero: we assume this lack of information is preponderant among \textit{tvEpisodes} in the dataset, therefore the model has overfitted on it. This also rings true for \textit{regions}: the feature \textit{regions\_Other} has a negative contribution for those \textit{tvEpisodes} which do have a country for \textit{regions}, positive otherwise.
+All four \textit{\textbf{tvEpisodes}} were correctly classified. For all of them, the most important feature was \textit{runtimeMinutes}, except for the only one that was classified with 100\% confidence (Medoid n. 5). Here, the biggest contribution (+0.29) has been made by \textit{numRegions} (cf. Fig \ref{fig:shap_medoid_5.png}). Looking at the record's values, \textit{numRegions} is set to zero: we assume this lack of information is preponderant among \textit{tvEpisodes} in the dataset, therefore the model has overfitted on it. This also rings true for \textit{regions}: the feature \textit{regions\_Other} has a negative contribution for those \textit{tvEpisodes} which do have a country for \textit{regions}, positive otherwise.
 
 Medoids n. 8 and n. 9 are \textit{\textbf{shorts}}: both have as most important feature the genre \textit{Short} (+0.28 and +0.23, respectively), followed by \textit{runtimeMinutes} (+0.15 and +0.19) and \textit{canHaveEpisodes} (+0.06 and +0.04). They were confidently classified, with 97.7\% and 87.3\% probability.
 
 \begin{figure}
     \includegraphics[width=\columnwidth]{../results/images/shap_medoid_5.png}
-    \caption{Waterfall plot for medoid n. 5 (correct \textit{tvEpisode}, 100\% confidence).}
+    \caption{Waterfall plot for Medoid n. 5 (correct \textit{tvEpisode}, 100\% confidence).}
     \label{fig:shap_medoid_5.png}
 \end{figure}
 
@@ -33,5 +33,5 @@ As for Medoid 3 and 11, the misclassification is quite confident: as we know, th
     \label{fig:shap_medoid_11_true_label.png}
 \end{figure}
 
-For Medoid 1, on the other hand, the black box was not as confident. The biggest singular positive contributions towards \textit{tvMovie} were made by \textit{runtimeMinutes} and \textit{writerCredits} (+0.06), though the probability was mostly influenced by the sum of many smaller positive contributions.
+For Medoid 1, on the other hand, the classification was not as confident. The biggest singular positive contributions towards \textit{tvMovie} were made by \textit{runtimeMinutes} and \textit{writerCredits} (+0.06), though the probability was mostly influenced by the sum of many smaller positive contributions.
 W.r.t. the true label \textit{video}, the biggest negative contributions are due to the fact that the title was produced and distributed in the US (-0.03 and -0.02), and the fact that it isn't tagged as genre \textit{Adult} (-0.02).
