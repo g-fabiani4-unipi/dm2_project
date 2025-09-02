@@ -2,7 +2,7 @@ In this section, we  will examine the performance of various advanced classifica
 
 Since no features showed high correlation with \textit{averageRating}, while some did exhibit different distribution tendencies w.r.t. \textit{titleType}, we anticipated that the second classification task would yield better results.
 
-In evaluating and comparing our classification models, we selected macro F1 as the main performance metric, given that the different target classes have variable support. For each model, we additionally plotted the Precision-Recall (PR) curves for each class using the one-vs-rest strategy and reported its PR AUC. We favored PR curves instead of ROC curves because they are more informative in multiclass and imbalanced settings.
+In evaluating and comparing our classification models, we selected macro F1 as the main performance metric, given that the different target classes have variable support. For each model, we additionally plotted the Precision-Recall (PR) curves for each class using the one-vs-rest strategy and reported the overall PR AUC. We favored PR curves over ROC curves because they are more informative in multiclass and imbalanced settings.
 
 \subsection{Pre-processing}
 \label{classification_preprocessing}

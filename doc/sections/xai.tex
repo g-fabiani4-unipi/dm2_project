@@ -4,9 +4,9 @@ In this section, we'll expand the global overview on feature importance returned
 Initially, our plan was to compute SHAP values for the entire test set and run K-Means on the explanations, in order to focus our analysis on the centroids or medoids, i.e. the 'prototypical' explanations. However, this approach proved to be too computationally expensive. 
 We therefore decided to only compute the SHAP values for 'prototypical' instances of the test set. In order to do that, we ran K-Means on the test set and we approximated the medoids by selecting the test instances closest to the centroids. For simplicity, we clustered the data using only numerical features, scaled with RobustScaler. We employed the elbow method to determine the optimal value of clusters, which resulted in k = 13.
 
-Twelve out of the 13 instances either belonged to or were classified as one of the top three \textit{titleTypes}: \textit{movie}, \textit{tvEpisode} and \textit{short}. Three instances were misclassified. Overall, we find that \textit{runtimeMinutes} is the most important feature for almost all records, confirming what anticipated by the Random Forest Gain importance (cf. Fig. \ref{fig:rf_feat_impo_tt.png}).
+Twelve out of the 13 instances either belonged to or were classified as one of the top three \textit{titleTypes}: \textit{movie}, \textit{tvEpisode} and \textit{short}. Three instances were misclassified. Overall, we find that \textit{runtimeMinutes} is the most important feature for almost all records, confirming what anticipated by the Random Forest MDI importance (cf. Fig. \ref{fig:rf_feat_impo_tt.png}).
 
-All four \textit{\textbf{tvEpisodes}} were correctly classified. For all of them, the most important feature was \textit{runtimeMinutes}, except for the only one that was classified with 100\% confidence, Medoid n. 5: the biggest contribution, with +0.29, has been made by \textit{numRegions} (cf. Fig \ref{fig:shap_medoid_5.png}). Looking at the record's values, \textit{numRegions} is set to zero: we assume this lack of information is preponderant among \textit{tvEpisodes} in the dataset, therefore the model has overfitted on it. This also rings true for \textit{regions}: the feature \textit{regions\_Other} has a negative contribution for those \textit{tvEpisodes} which \textit{do} have a country for \textit{regions}, positive otherwise.
+All four \textit{\textbf{tvEpisodes}} were correctly classified. For all of them, the most important feature was \textit{runtimeMinutes}, except for the only one that was classified with 100\% confidence, Medoid n. 5: the biggest contribution, with +0.29, has been made by \textit{numRegions} (cf. Fig \ref{fig:shap_medoid_5.png}). Looking at the record's values, \textit{numRegions} is set to zero: we assume this lack of information is preponderant among \textit{tvEpisodes} in the dataset, therefore the model has overfitted on it. This also rings true for \textit{regions}: the feature \textit{regions\_Other} has a negative contribution for those \textit{tvEpisodes} which do have a country for \textit{regions}, positive otherwise.
 
 Medoids n. 8 and n. 9 are \textit{\textbf{shorts}}: both have as most important feature the genre \textit{Short} (+0.28 and +0.23, respectively), followed by \textit{runtimeMinutes} (+0.15 and +0.19) and \textit{canHaveEpisodes} (+0.06 and +0.04). They were confidently classified, with 97.7\% and 87.3\% probability.
 
@@ -16,11 +16,11 @@ Medoids n. 8 and n. 9 are \textit{\textbf{shorts}}: both have as most important 
     \label{fig:shap_medoid_5.png}
 \end{figure}
 
-All four correctly classified \textbf{\textit{movies}} have high probability (>80\%); their two most important features are \textit{runtimeMinutes}, with a contribution between +0.2 and +0.29, followed by \textit{canHaveEpisodes} (around 0.07; of course all records had a negative value). 
+All four correctly classified \textbf{\textit{movies}} have high probability (>80\%); their two most important features are \textit{runtimeMinutes}, with a contribution between +0.2 and +0.29, followed by \textit{canHaveEpisodes} (around 0.07; of course all records had as value \textit{False}). 
 
 The following instances were misclassified:
 \begin{itemize}
-    \item Medoid 1: classified as \textit{tvMovie} (50.9\%) instead of \textit{video} (10.4\%) ;
+    \item Medoid 1: classified as \textit{tvMovie} (50.9\%) instead of \textit{video} (10.4\%);
     \item Medoid 3: classified as movie (83\%) instead of \textit{tvMovie} (11.4\%);
     \item Medoid 11: classified as movie (95.2\%) instead of \textit{tvMovie} (3.5\%);
 \end{itemize}
