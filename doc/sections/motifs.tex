@@ -25,7 +25,7 @@ Knowing that our time series display day of week seasonality (and therefore they
 
 Fig \ref{fig:medoid_motifs} shows in green the motifs found on two cluster medoids that are good representative, respectively of instant hits and `late bloomers'.
 
-Additionally, we looked for a conserved pattern between these two medoids. Interestingly, the best matching pattern visualized in \ref{fig:conserved_pattern} is also a motif in \emph{Mad Max: Fury Road}.
+Additionally, we looked for a conserved pattern between these two medoids. Interestingly, the best matching pattern visualized in \ref{fig:conserved_pattern} is also a motif in \emph{Mad Max: Fury Road} (see again fig \ref{fig:motifs_mad_max}).
 This may suggest that the seasonal peaks in movies from the two clusters are not so different after all and probably reflect a general pattern of movie-goers behavior.
 
 
@@ -33,10 +33,12 @@ This may suggest that the seasonal peaks in movies from the two clusters are not
 In order to detect discords, we searched for points on the matrix profile that were deemed anomalous by a one-sided Grubbs test (one such subsequence is reported in red in fig. \ref{fig:motifs_mad_max}).
 With our more stringent definition of discord, we were able to detect 89 records in our dataset that contained anomalous patterns.
 
-Interestingly, the two records that we noticed were anomalous with respect to year of release, were indeed in this group, and when we visualized them, we noticed that they bear scarce resemblance to the time series analyzed so far. This may warn us that our analysis isn't really generalizable to longer box office trends out of the specific historical period that we are seeing here, as it is predicated on societal trends that may have less staying power than we may think.
+Interestingly, the two records that we identified as outliers w.r.t. year of release, were indeed in this group.
+When we visualized them, we noticed that they bear scarce resemblance to the time series analyzed so far.
+This may warn us that our analysis isn't really generalizable to longer box office trends out of the specific historical period represented in our dataset, as it is predicated on societal trends that may have less staying power than we may think.
 
 \subsubsection{Consensus Motif}
-We also leveraged the matrix profile in order to find a consensus motif, i.e. the subsequence from the time series dataset that induces the smallest radius. We ran the \emph{Ostinato} algorithm on our data with a window size of 28 timestamps (i.e. a two weeks period) which we judged to be good size for finding a discriminative subsequence.
+We also leveraged the matrix profile in order to find a consensus motif, i.e. the subsequence from the entire dataset that induces the smallest radius. We ran the \emph{Ostinato} algorithm on our data with a window size of 28 timestamps (i.e. a two weeks period) which we judged to be good size for finding a discriminative subsequence.
 
 From each time series we extracted the best match for the consensus motif (see fig. \ref{fig:consensus_motif}). The visualization of the matching subsequences showed a pattern that is well known to us and this point: two major peaks in the weekend (the second smaller than the first) and smaller peaks in the middle of the week after each major peak. For most time series we observed only small deviations from this motif: for example a subtle anticipation of the second major peak or a relatively higher midweek peak.
 
@@ -62,4 +64,4 @@ To do this, we split our training data in action and non action movies and, afte
 The basic idea is that the matrix profile $P_{Action,Action}$ computed on the time series $T_{Action}$ allows us to identify conserved subsequences within $T_{Action}$. A matrix profile $P_{Action,NoAction}$, computed across two different time series $T_{Action}$ and $T_{NonAction}$ compares all the subsequences of $T_{Action}$ with all the subsequences in $T_{NoAction}$ in order to determine if there are any subsequences in $T_{Action}$ that can also be found in $T_{NoAction}$.
 If a discriminative pattern (shapelet) is present in the \emph{Action} class but not in the \emph{NoAction} class, then we would expect to see significant differences in heights among the matrix profiles $P_{Action,Action}$ and $P_{Action,NonAction}$. So, if we compute $P_{diff} = P_{Action,NoAction} - P_{Action,Action}$ we expect peak values to indicate good shapelets candidates, because they suggest patterns that are well conserved in their own class but very different from their closest match in the other class.
 
-After computing the matrix profiles with a window of 28 timestamps (so on a period of two weeks), for each class we extracted the top 10 candidate shapelets, which we then used in the classification task.
+After computing the matrix profiles with a window of 28 timestamps (so on a period of two weeks), for each class we extracted the top 10 candidate shapelets, which we then used in the classification task as detailed in \ref{sec:tsclass_shapelets}.
