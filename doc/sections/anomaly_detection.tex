@@ -31,11 +31,11 @@ Fig. \ref{fig:outliers_density} provides much needed perspective on the density 
 \subsubsection{HBOS}
 When analyzing records deemed anomalous by HBOS, we noticed that almost all of them (90\%) were movies and very popular movies, at that.
 In addition to that 44\% of candidate outliers received awards, a proportion that increased to 62\% when considering also nominations and 70\% of them had at least one video on their IMDB page, while all of them were reviewed by both critics and users.
-Interestingly, all of these proportions are much higher not only when compared with the general distribution in the dataset (cf table \ref{tab:binarized_features}), but also w.r.t. observed frequencies in movies.
+Interestingly, all of these proportions are much higher not only when compared with the general distribution in the dataset (cf. Table \ref{tab:binarized_features}), but also w.r.t. observed frequencies in movies.
 It should also be noted that, while TV episodes make up almost half of the dataset, no TV episode was deemed anomalous by HBOS.
 
-Visualizing HBOS results in latent space, we noticed that outliers and inliers have almost non overlapping distributions with respect to the first component.
-This is hardly surprising, considering which original features contribute to this component, and merely confirms what we already observed when checking the distribution of inliers and outliers with respect to the original features.
+Visualizing HBOS results in latent space, we noticed that outliers and inliers have almost non overlapping distributions w.r.t. the first component.
+This is hardly surprising, considering which original features contribute to this component, and merely confirms what we already observed when checking the distribution of inliers and outliers w.r.t. the original features.
 
 Checking the distribution of candidates against the clustering created in \ref{sec:tabular_clustering}, we found out that they came almost exclusively from C1 and C2.
 
@@ -46,7 +46,7 @@ In addition to that HBOS comes with a strong assumption of independence between 
 We adopted Elliptic Envelope as the only depth-based approach that has a python implementation.
 In contrast to a classic depth-based approach, this method comes with the assumption that the dataset has a Gaussian distribution; since this is not the case for our data, in this case we performed normalization with a Power Transformer in order to reduce skewness and stabilize variance.
 
-Candidate outliers extracted with this method show a wholly different distribution w.r.t title type: 261 are TV episodes, 423 tv series and 285 are shorts.
+Candidate outliers extracted with this method show a wholly different distribution w.r.t \textit{titleType}: 261 are \textit{tvEpisodes}, 423 \textit{tvSeries} and 285 are \textit{shorts}.
 The latter we found particularly interesting, since shorts make up only around 10\% of records in our dataset, but 35\% of candidate outliers.
 
 We were also able to see that outliers are distinct from inliers by runtime (they are much shorter) and year (they are older).
@@ -57,13 +57,13 @@ Isolation Forest obtained results that are very similar to those we already obse
 As a matter of fact, while HBOS and Elliptic Envelope candidate outliers showed minimal overlap, 40\% of Isolation Forest candidate outliers were already flagged by HBOS.
 
 Candidate outliers display extreme values on all features associated with big and popular productions.
-This is also evident by visualizing results on latent features: fig. \ref{fig:isolation_forest} shows that there is almost no overlap between outliers and inliers along the first component.
+This is also evident by visualizing results on latent features: Fig. \ref{fig:isolation_forest} shows that there is almost no overlap between outliers and inliers along the first component.
 96\% of candidate outliers come from either C1 or C2, with 80\% from C1 alone.
 Conversely, more than half of the records from C1 are considered anomalous.
-When confronting fig. \ref{fig:isolation_forest} with fig. \ref{fig:outliers_density}, we can see that while candidate outliers cluster together (at least according to our hierarchical clustering) and thus, logically speaking, they can't be considered isolated, records are extremely sparse on high values of the first component, thus explaining Isolation Forest results.
+When comparing Fig. \ref{fig:isolation_forest} with Fig. \ref{fig:outliers_density}, we can see that while candidate outliers cluster together (at least according to our hierarchical clustering) and thus, logically speaking, they can't be considered isolated, records are extremely sparse on high values of the first component, thus explaining Isolation Forest results.
 
 \subsubsection{Conclusions}
 All methods were united in deeming records representing big and popular productions as anomalous.
 We found no indication that the anomalous values encountered were in any way erroneous or the result of a data quality problem, so it doesn't make sense to treat them as missing values.
 While it makes sense that, among all forms of visual entertainment recorded in our dataset, blockbusters would be exceedingly rare, we do not find it appropriate to remove them from the data.
-We maintain that any analysis of this dataset excluding such titles would fail to capture a very important aspect of the phenomena it claimed to model and would be, as a consequence meaningless.
+We maintain that any analysis of this dataset excluding such titles would fail to capture a very important aspect of the phenomena it claimed to model and would consequentially be consequence meaningless.
