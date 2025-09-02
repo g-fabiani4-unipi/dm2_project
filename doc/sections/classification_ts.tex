@@ -96,7 +96,7 @@ For example: three of the extracted shapelets show a pretty similar pattern, wit
 However, one of these is associated with the positive class, while the other two with the negative class.
 While the general context for these patterns is clear, the subtle differences that make them contribute to a correct classification escape us.
 
-Our second approach was to leverage the 20 shapelets extracted from the matrix profile as detailed in \ref{sec:motifs}.
+Our second approach was to leverage the 20 shapelets extracted from the matrix profile as detailed in \ref{sec:shapelet_discovery}.
 
 We initially attempted to find the top shapelets from our initial set using recursive feature elimination to determine the ranking of all features and then testing the same Decision Tree classifier on the top n features in order to determine the optimal selection.
 However, since the performance with this approach was not very impressive (average precision of 0.4), we decided to retain all candidate shapelets and adopt a Random Forest Classifier.
@@ -137,7 +137,7 @@ Inspecting the confusion matrix in fig. \ref{fig:ts_clf_test_conf_mat}, we can s
     \caption{Confusion matrix for C22 classifier on the test set.}\label{fig:ts_clf_test_conf_mat}
 \end{figure}
 
-Catch22 RF was also the best regressor: with a mean squared error of 0.55 (much lower than the target variable variance) and a coefficient of determination of 0.34 (TSF reached .29).
+Catch22 RF was also the best regressor: with a mean squared error of 0.55 (much lower than the target variable variance) and a coefficient of determination of 0.34, if clearly outperformed TSF (R2 0.29).
 From fig. \ref{fig:ts_clf_test_scatter} we can see that, although predicted values are squeezed towards the mean, still they display a positive linear correlation with actual values (Pearson R 0.58, p value < 0.01).
 
 \begin{figure}

@@ -1,6 +1,6 @@
-Model,precision,recall,f1,average precision
+Model,precision,recall,f1,PR auc
 baseline,.30 $\pm$ .06,.30 $\pm$ .05,.30 $\pm$ .05,.32 $\pm$ .02
-KNN,.56 $\pm$ .02,.52 $\pm$ 0.04,.54 $\pm$ .02,.58 $\pm$ .03
+KNN,.56 $\pm$ .02,.52 $\pm$ .04,.54 $\pm$ .02,.58 $\pm$ .03
 C22 RF,.65 $\pm$ .05,.42 $\pm$ .05,.51 $\pm$ .05,.63 $\pm$ .05
 TSF,.63 $\pm$ .05,.41 $\pm$ .03,.50 $\pm$ .03,.62 $\pm$ .05
 drCIF,.66 $\pm$ .04,.41 $\pm$ .08,.50 $\pm$ .06,.58 $\pm$ .05
