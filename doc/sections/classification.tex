@@ -1,8 +1,8 @@
 \subsection{Logistic Regression}
-As a baseline, we first tried a Logistic Regression model. As the algorithm assumes that the features follow a Gaussian distribution, we scaled numerical features using PowerTransformer, which reduces skewness and stabilizes variance.
+To set a baseline, we first tried a Logistic Regression model. As the algorithm assumes that the features follow a Gaussian distribution, we scaled numerical features using PowerTransformer, which reduces skewness and stabilizes variance.
 
 \subsubsection{Rating}
-Using the default parameters yielded a macro F1 of 0.144 and an accuracy of 0.388. We performed a grid search using 5-fold cross validation, which resulted in a very small increase, with a 0.146 average macro F1 on the validation sets and 0.152 on the training set, which at least proves no overfitting.
+Using the default parameters yielded a macro F1 of 0.144 and an accuracy of 0.388. We performed a grid search using 5-fold cross validation, which resulted in a very small increase, with a 0.146 average macro F1 on the validation sets and 0.152 on the training set, indicating no overfitting.
 We tested the following hyperparameters (the values for the final model are in bold):
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,
                    escapeinside={(*@}{@*)}]
@@ -15,9 +15,9 @@ We tested the following hyperparameters (the values for the final model are in b
 
 On the test set, the final model achieved a \textbf{macro F1} of\textbf{ 0.145} and an \textbf{accuracy} of \textbf{0.388}, comparable to the default model. The poor performances across decision thresholds are confirmed by the \textbf{PR AUC} of only \textbf{0.193}.
 
-The model has managed to generalize some information only for the classes with the highest support: the performances peak for the mode, (7,8] (F1: 0.544), its neighboring classes are confused for it most of the time, and as we move to the tail of the bell distribution, it achieves consistently poor results (F1 < 0.05).
+The model has managed to generalize some information only for the classes with the highest support: the performances peak for the mode, \textit{(7,8]} (F1: 0.544), its neighboring classes are confused for it most of the time, and as we move to the tail of the bell distribution, it achieves consistently poor results (F1 < 0.05).
 
-Looking at the model's coefficients, the overall most important feature is \textit{hasCriticReviews} (mean absolute value > 1.2, while for the other coefficients in the top 15 is in the interval [0.6, 0.7]): it is the first or second-biggest coefficient for the best performing classes (i.e. for the interval (5,8]), and for all of them it takes on a negative value, i.e. having critical reviews lowers the probability of a record of having an 'average' rating.
+Looking at the model's coefficients, the overall most important feature is \textit{hasCriticReviews} (mean absolute value > 1.2, while for the other coefficients in the top 15 it is in the interval \textit{[0.6, 0.7]}): it is the first or second-biggest coefficient for the best performing classes (i.e. for the interval \textit{(5,8]}), and for all of them it takes on a negative value, suggesting that having critical reviews lowers the probability of a record of having an 'average-to-high' rating.
 
 \subsubsection{Title Type}
 For this task, the final model resulting from the grid search achieved an average validation macro F1 of 0.653 (on the training set: 0.664). The final parameters chosen were: \texttt{{'C': 100, 'penalty': 'l2', 'solver': 'newton-cg'}}.
@@ -30,8 +30,8 @@ The four most popular classes (\textit{tvEpisode}, \textit{short}, \textit{movie
 
 The 15 most important features are reported in Fig. \ref{fig:LR_feat_impo_tt.png}. Overall, the two most informative features are:
 \begin{itemize}
-    \item \textit{canHaveEpisodes}: it has very high positive values for \textit{tvSeries} (+13.15) and \textit{tvMiniSeries} (+12.18) and negative for all other classes; it's also the most important feature for \textit{movie} (-4.75). 
-    \item genre \textit{Short}: of course, it's the most important feature for \textit{short} and \textit{tvShort}, and it's the second most important for \textit{video} with positive values; it's high up in the ranking with a negative value for \textit{movie}, \textit{tvEpisode}, \textit{tvMovie}.
+    \item \textit{canHaveEpisodes}: it has very high positive values for \textit{tvSeries} (+13.15) and \textit{tvMiniSeries} (+12.18) and negative for all other classes; it's also the most important feature for \textit{movie} (-4.75). This means that the model has learned to use this feature to distinguish serialized from non-serialized content.
+    \item genre \textit{Short}: of course, it's the most important feature for \textit{short} and \textit{tvShort}, and it's the second most important for \textit{video} with positive values; it's high up in the ranking with a negative value for \textit{movie}, \textit{tvEpisode}, and \textit{tvMovie}.
 \end{itemize}
 
 \begin{figure}
@@ -41,7 +41,7 @@ The 15 most important features are reported in Fig. \ref{fig:LR_feat_impo_tt.png
 \end{figure}
 
 \subsection{Linear Support Vector Machine}
-For Support Vector Machines (SVMs), we scaled numerical features using RobustScaler, as our data contains outliers. We deemed it  We tested the linear kernel and the Radial Basis Function kernel separately to exploit sklearn's optimized LinearSVC implementation.
+For Support Vector Machines (SVMs), we scaled numerical features using RobustScaler, as our data contains outliers. We tested the linear kernel and the Radial Basis Function kernel separately to exploit sklearn's optimized LinearSVC implementation.
 
 \subsubsection{Rating}
 For LinearSVC, we tested the following parameter grid using a grid search with 5-fold cross validation:
@@ -55,14 +55,14 @@ For LinearSVC, we tested the following parameter grid using a grid search with 5
     'class_weight': [None, (*@\textbf{'balanced'}@*)]  }
 \end{lstlisting}
 
-It resulted in an average macro F1 of 0.158 for validation and of 0.164 on the training set.
+For \textit{rating}, it resulted in an average macro F1 of 0.158 for validation and of 0.164 on the training set.
 
 On the test set, w.r.t. Logistic Regression, the model achieved a higher \textbf{macro F1} (\textbf{0.158}), but a lower \textbf{accuracy} (\textbf{0.270}).
-Indeed, the F1 for the best performing classes has decreased ((7,8]: 0.496 vs 0.544; (6,7]: 0.215 vs 0.356, (5,6]: 0.259 vs 0.283), in favor of slightly better performances for classes with lower support: the decrease in accuracy is linked to the fact that the model tries to predict these lower support classes more often, rather than focusing merely on the central classes. This led to a notable increase in F1 for (3,4] (0.113 vs 0.04) and (9,10] (0.145 vs 0.046), but it is clear that the model still struggles. The \textbf{PR AUC} is also slightly worse, \textbf{0.175}.
+Indeed, the F1 for the best performing classes has decreased (\textit{(7,8]}: 0.496 vs 0.544; \textit{(6,7]}: 0.215 vs 0.356, \textit{(5,6]}: 0.259 vs 0.283), in favor of slightly better performances for classes with lower support: the decrease in accuracy is linked to the fact that the model tries to predict these lower support classes more often, rather than focusing merely on the central classes. This led to a notable increase in F1 for \textit{(3,4]} (0.113 vs 0.04) and \textit{(9,10]} (0.145 vs 0.046), but it is clear that the model still struggles. The \textbf{PR AUC} is also slightly worse, \textbf{0.175}.
 
 The confusion matrix confirms this tendency: if for Logistic Regression predictions were concentrated on the best performing classes, with many zeros populating the lowest classes, now confusion is spread throughout. 
 
-The most important feature is \textit{tvEpisode} (mean absolute value: 0.175): it is at number one, with negative values, for classes from (2,3] to (5,6] — this would suggest that serialized content is less likely to have bad rating. Classes (7,8] and (8,9] both have \textit{movie} as most important feature, with negative contributions (-0.207 and -190, respectively). This might explain why the latter is mostly classified as the former, which is the class with the highest support.
+The most important feature is \textit{tvEpisode} (mean absolute value: 0.175): it is at number one, with negative values, for classes from \textit{(2,3]} to \textit{(5,6] }— this would suggest that serialized content is less likely to have bad rating. Classes \textit{(7,8]} and \textit{(8,9]} both have \textit{movie} as most important feature, with negative contributions (-0.207 and -0.190, respectively). This might explain why the latter is mostly classified as the former, which is the class with the highest support.
 
 \subsubsection{Title Type}
 The model returned by the grid search yielded an average validation macro F1 of 0.646 (vs 0.654 on the training set); the parameters were \texttt{'C': 0.1, 'class\_weight': 'balanced', 'loss': 'squared\_hinge', 'max\_iter': 5000, 'penalty': 'l1'}.
@@ -95,7 +95,7 @@ Similarly to what had happened with \textit{rating}, the first grid search retur
 
 On the test set, this model clears all previous attempts, with a \textbf{macro F1} of \textbf{0.746} and an \textbf{accuracy} of \textbf{0.938}.
 
-The performances for all classes increased. \textit{tvEpisode} now achieves an F1 of 0.99; \textit{videogame} improved greatly, reaching 0.884 F1. Nevertheless, we only get a \textbf{PR AUC} of \textbf{0.689}; indeed, the curves in Fig. \ref{fig:pr_svm_rbf_tt.png} show how the precision for half of the classes sinks at around 60\% recall. This means that while the model shows excellent performance metrics on a per-class basis, it has difficulty maintaining a reliable performance when attempting to comprehensively identify instances of minority classes.
+The performances for all classes increased. \textit{tvEpisode} now achieves an F1 of 0.99; \textit{videogame} improved greatly, reaching 0.884 F1. Nevertheless, we only get a \textbf{PR AUC} of \textbf{0.689}; indeed, the curves in Fig. \ref{fig:pr_svm_rbf_tt.png} show how the precision for half of the classes sinks at around 60\% recall. This means that, while the model shows excellent performance metrics on a per-class basis, it has difficulty maintaining a reliable performance when attempting to comprehensively identify instances of minority classes.
 
 \begin{figure}
     \includegraphics[width=\columnwidth]{../results/images/pr_svm_rbf_tt.png}
@@ -119,7 +119,7 @@ Indeed, there are many possible hyperparameters to tune. For each task, we ran t
 \subsubsection{Rating}
 Before proceeding with hyperparameter tuning, we first tested a Random Forest using default parameters, which yielded an average validation macro F1 of 0.296, and an even better 0.302 macro F1 score on the test set.
 
-As shown in Fig. \ref{fig:rf_comparison_n_estimators_rating.png}, the number of estimators is not a strong driver of performance. Although the performance of the other two models was very close, we chose the best model with 300 base classifiers, which yielded an average macro F1 equal to 0.308 for validation, and equal to 0.968 for train. Its parameters are: \texttt{{'n\_estimators': 300, 'min\_samples\_split': 5, 'min\_samples\_leaf': 1, 'max\_depth': None, 'criterion': 'gini', 'class\_weight': 'balanced'}}.
+As shown in Fig. \ref{fig:rf_comparison_n_estimators_rating.png}, analyzing the results from the Randomized Searches revealed that the number of estimators is not a strong driver of performance. Although the performance of the other two models was very close, we chose the best model with 300 base classifiers, which yielded an average macro F1 equal to 0.308 for validation, and equal to 0.968 for train. Its parameters are: \texttt{{'n\_estimators': 300, 'min\_samples\_split': 5, 'min\_samples\_leaf': 1, 'max\_depth': None, 'criterion': 'gini', 'class\_weight': 'balanced'}}.
 
 \begin{figure}
     \includegraphics[width=\columnwidth]{../results/images/rf_comparison_n_estimators_rating.png}
@@ -128,11 +128,11 @@ As shown in Fig. \ref{fig:rf_comparison_n_estimators_rating.png}, the number of 
 \end{figure}
 
 
-Whether such a gap between validation and train macro F1 should be interpreted as a sign of overfitting for Random Forest is debated in the literature: it has been argued that, even if the single trees can overfit, they tend to do so in different ways, and that combining them in an ensemble reduces the overall variance. Thus, although pruning the individual trees can be beneficial, unless the dataset is very simple, we could consider Random Forest as particularly robust against overfitting.
+Whether such a gap between validation and train macro F1 should be interpreted as a sign of overfitting for Random Forest is debated in the literature: it has been argued that, even if the single trees can overfit, they tend to do so in different ways, so that combining them in an ensemble reduces the overall variance. Thus, although pruning the individual trees can be beneficial, unless the dataset is very simple, we could consider Random Forest as particularly robust against overfitting.
 
 The model's performance on the test set increases, making it the best model thus far: it achieves a \textbf{macro F1} of \textbf{0.325}, an \textbf{accuracy} of \textbf{0.452}, and a \textbf{PR AUC} of \textbf{0.318}.
 
-It achieves the most balanced performance, with six classes out of ten scoring an F1 >= 0.3. Confusion remains spread out for the minority classes (from 0 to 4), whereas for the others it remains concentrated amongst neighboring classes.
+It achieves the most balanced performance, with six classes out of ten scoring an F1 >= 0.3. Confusion remains spread out for the minority classes (from \textit{0} to \textit{4}), whereas for the others it remains concentrated amongst neighboring classes.
 
 The Mean Decrease in Impurity (MDI) returned as the most important features \textit{numVotes} and \textit{startYear} (almost 0.10), followed by \textit{totalCredits} (around 0.9).
 
@@ -211,7 +211,7 @@ On the test set, the model achieved \textbf{0.289 macro F1}, \textbf{0.440 accur
 Consistently with Random Forest, \textit{startYear} and \textit{numVotes} emerged as the most important features, with comparable gain values.
 
 \subsubsection{Title Type}
-Analyzing the results of the Random Searches leads to the same discovery we had for \textit{rating}: given a certain hyperparameter configuration, the average cross-validation macro F1 grows for 300 estimators w.r.t. 100, but so does the overfitting gap. Nevertheless, Fig. \ref{fig:lightgbm_overfitting_vs_performance_tt.png} shows how the relationship between the overfitting gap and the validation macro F1 grows more slowly. Moreover, the best performing models are only moderately overfitted (gap of around 0.2 vs 0.6 for \textit{rating}.)
+Analyzing the results of the Random Searches leads to the same discovery we had for \textit{rating}: given a certain hyperparameter configuration, the average cross-validation macro F1 grows for 300 estimators w.r.t. 100, but so does the overfitting gap. Nevertheless, Fig. \ref{fig:lightgbm_overfitting_vs_performance_tt.png} illustrates how the relationship between the overfitting gap and the validation macro F1 grows more slowly. Moreover, the best performing models are only moderately overfitted (gap of around 0.2 vs 0.6 for \textit{rating}.)
 
 \begin{figure}
     \includegraphics[width=\columnwidth]{../results/images/lightgbm_overfitting_vs_performance_tt.png}
@@ -272,9 +272,9 @@ Plotting the trade-off between the overfitting gap and the validation macro F1 (
     \label{fig:nn_overfitting_tradeoff.png}
 \end{figure}
 
-On the test set, the model achieved a macro f1 of 0.244, an accuracy of 0.413 (lower than the default model), and a PR AUC of 0.244.
+On the test set, the model achieved a \textbf{macro F1} of \textbf{0.244}, an \textbf{accuracy} of \textbf{0.413} (lower than the default model), and a \textbf{PR AUC} of \textbf{0.244}.
 
-We also tried implementing early stopping: the macro F1 sank to 0.236, but the accuracy increased slightly, reaching 0.425. 
+We also tried implementing early stopping, which stopped the training at around 40 epochs (vs 200): the macro F1 sank to 0.236, but the accuracy increased slightly, reaching 0.425. 
 
 \subsubsection{TitleType}
 In this case, in terms of macro F1 the default model reaches 0.729 on the validation set, 0.857 on the training set, and 0.730 on the test set. It also achieves 0.931 test accuracy.
@@ -290,10 +290,10 @@ Indeed, the scatterplot in Fig. \ref{fig:nn_overfitting_tradeoff_tt.png} reveals
 \end{figure}
 
 On the test set, the model still achieves \textbf{0.738 macro F1}, coupled with \textbf{0.934 accuracy} and \textbf{0.784 PR AUC}.
-Implementing early stopping leads to a drop in macro F1 to 0.728, as it performs slightly worse on minority classes. 
+With early stopping, the training is halted at around 130 epochs. It leads to a drop in macro F1 to 0.728, as the model performs slightly worse on minority classes. 
 
 \subsection{Conclusions}
-The performances of the different models for the two tasks are summarized in Table \ref{tab:rating_models} and \ref{tab:titletype_models}.
+The performances of the different models for the two tasks are summarized in Table \ref{tab:rating_models} and \ref{tab:titletype_models}. Ensemble methods have clearly outperformed the rest; the comparatively poorer performance of Logistic Regression and Linear SVC indicates that linear models are insufficient to capture the underlying class boundaries.
 
 \begin{table}
     \centering
@@ -337,8 +337,8 @@ The performances of the different models for the two tasks are summarized in Tab
 
 As anticipated, the task of predicting \textit{titleType} yielded better results across models, which, just like for DM1, is likely due to better class separability and stronger feature association.
 
-All models achieved great results for the more popular classes, with an F1 around 0.9, while the results for the minority classes varied from around 0.4 to a robust 0.7 for the best models. In particular, the best models achieved great results for \textit{videogame}, and were better at separating \textit{tvMovie} and \textit{tvMiniSeries} from their more popular counterparts, \textit{movie} and \textit{tvSeries}. Ensemble methods have clearly outperformed the rest.
+All models achieved great results for the more popular classes, with an F1 around 0.9, while the results for the minority classes varied from around 0.4 to a robust 0.7 for the best models. In particular, the best models achieved great results for \textit{videogame}, and were better at separating \textit{tvMovie} and \textit{tvMiniSeries} from their more popular counterparts, \textit{movie} and \textit{tvSeries}.
 
-With regard to \textit{rating}, the performance of every model reflects the class distribution, which resembles a left-skewed Gaussian: performances peak for class (7,8], the mode, and quickly degrade. The models do not have a chance to generalize on the lowest and the highest classes, especially those in the 'tail', due to lack of representation. The best models, however, managed to concentrate their confusion on neighboring classes, especially around the peak of the distribution.
+With regard to \textit{rating}, the performance of every model reflects the class distribution, which resembles a left-skewed Gaussian: performances peak for class \textit{(7,8]}, the mode, and quickly degrade. The models do not have a chance to generalize on the lowest and the highest classes, especially those in the 'tail', due to lack of representation. The best models, however, managed to concentrate their confusion on neighboring classes, especially around the peak of the distribution. Future work could explore undersampling and oversampling techniques, which might help improve generalization.
 
-Finally, there have been some challenges tied to overfitting; future work could explore undersampling and oversampling techniques to improve generalization.
+Finally, some challenges related to overfitting were observed, despite using hyperparameter grids designed to explore different trade-offs between bias and variance; investigating stronger regularization strategies or data balancing techniques may help improve robustness.
