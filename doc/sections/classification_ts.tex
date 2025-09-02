@@ -96,7 +96,7 @@ For example: three of the extracted shapelets show a pretty similar pattern, wit
 However, one of these is associated with the positive class, while the other two with the negative class.
 While the general context for these patterns is clear, the subtle differences that make them contribute to a correct classification escape us.
 
-Our second approach was to leverage the 20 shapelets extracted from the matrix profile as detailed in \ref{sec:motifs}.
+Our second approach was to leverage the 20 shapelets extracted from the matrix profile as detailed in \ref{sec:shapelet_discovery}.
 
 We initially attempted to find the top shapelets from our initial set using recursive feature elimination to determine the ranking of all features and then testing the same Decision Tree classifier on the top n features in order to determine the optimal selection.
 However, since the performance with this approach was not very impressive (average precision of 0.4), we decided to retain all candidate shapelets and adopt a Random Forest Classifier.
